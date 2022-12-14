@@ -2,18 +2,18 @@ DROP SCHEMA IF EXISTS encounters CASCADE;
 CREATE SCHEMA encounters;
 -- Potwory
 CREATE TABLE encounters.potwory(
-    "id" INTEGER NOT NULL ,
+    "id" SERIAL NOT NULL ,
     "nazwa" VARCHAR(255) NOT NULL,
-    "opis" VARCHAR(255) NOT NULL,
+    "opis" VARCHAR(1000) NOT NULL,
     "poziom_trudnosci" INTEGER NOT NULL,
     "id_rasa" INTEGER NOT NULL
 );
 CREATE INDEX "potwory_nazwa_index" ON
-    "potwory"("nazwa");
+    encounters.potwory("nazwa");
 CREATE INDEX "potwory_poziom_trudnosci_index" ON
-    "potwory"("poziom_trudnosci");
+    encounters.potwory("poziom_trudnosci");
 ALTER TABLE
-    "potwory" ADD PRIMARY KEY("id");
+    encounters.potwory ADD PRIMARY KEY("id");
 -- -- Tereny
 -- CREATE TABLE "tereny"(
 --     "id" SERIAL INTEGER NOT NULL,
