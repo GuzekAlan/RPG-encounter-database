@@ -1,6 +1,12 @@
 from django.core.files import File
 
 def executeScriptsFromFile(filename, cursor):
+    """Stolen from StackOverflow function. It might not be the best but it works
+
+    Args:
+        filename string: absolute path to a file
+        cursor: cursor for database
+    """
     # Open and read the file as a single buffer
     fd = open(filename, 'r')
     sqlFile = fd.read()
