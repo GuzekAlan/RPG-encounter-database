@@ -19,5 +19,5 @@ from rpg_encounter.encounters import urls as encounters_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('encounters/', include(encounters_urls))
+    path('', include(encounters_urls))
 ]
