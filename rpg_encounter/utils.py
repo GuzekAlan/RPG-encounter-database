@@ -1,5 +1,3 @@
-from django.core.files import File
-
 def executeScriptsFromFile(filename, cursor):
     """Stolen from StackOverflow function. It might not be the best but it works
 

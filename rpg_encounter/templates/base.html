@@ -1,0 +1,21 @@
+{% load st  8n %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="description" content="RPG Encounters Database"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Asap:400,800">
+  {% block extra_styles %}{% endblock %}
+  <title>Encounters</title>
+</head>
+<body>
+<div class="content-wrapper">
+  <main>
+    <div class="content">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</div>
+</body>
+</html>
