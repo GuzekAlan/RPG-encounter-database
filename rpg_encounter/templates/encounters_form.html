@@ -1,27 +1,22 @@
 {% extends 'base.html' %}
 {% load static i18n %}
 
-{% comment %} {% block extra_styles %}
-  <link rel="stylesheet" href="{% static 'css/wishlist.css' %}">
-{% endblock %} {% endcomment %}
-
 {% block content %}
-  <div class="row">
-    <div class="col-7-md col-12">
-        <div class="form-content">
-          <form method="post" novalidate>{% csrf_token %}
-            <div class="row">
-              <div class="col-6">
-                <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
-                {{ form.name }}
-              </div>
-            </div>
-            <div class="is-center">
-              <input class="button secondary radius-10" type="submit" value="Send a wish list">
-            </div>
-          </form>
+  <div>
+    <form action="" method="post" novalidate>{% csrf_token %}
+      <div>
+        <div>
+          <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+          {{ form.name }}
+        </div>
+        <div>
+          <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+          {{ form.description }}
         </div>
       </div>
-    </div>
+      <div>
+        <input type="submit" value="Zapisz">
+      </div>
+    </form>
   </div>
 {% endblock %}
