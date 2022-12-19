@@ -2,8 +2,11 @@
 
 {% block content %}
     <div>
-        <form action="{% url 'encounters:test_form' %}">
-            <input type="submit" value="Dodaj teren" />
+        <form action="{% url 'encounters:terrain_form' %}">
+            <input type="submit" value="Dodaj Teren" />
+        </form>
+        <form action="{% url 'encounters:location_form' %}">
+            <input type="submit" value="Dodaj Lokacje" />
         </form>
         <form action="{% url 'encounters:create_database' %}">
             <input type="submit" value="Create Database" />
