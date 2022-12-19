@@ -41,7 +41,7 @@ CREATE TABLE encounters.skarby(
     "id" SERIAL NOT NULL,
     "nazwa" VARCHAR(100) NOT NULL,
     "opis" VARCHAR(1000) NOT NULL,
-    "rzadkosc" INTEGER NOT NULL,
+    "rzadkosc" VARCHAR(100) NOT NULL,
     "wartosc" INTEGER NOT NULL
 );
 CREATE INDEX "skarby_rzadkosc_index" ON

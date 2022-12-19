@@ -23,5 +23,6 @@ class CreateDatabaseView(TemplateView):
     def get_context_data(self, **kwargs):
         with connection.cursor() as cursor:
             executeScriptsFromFile(path.join(path.dirname(__file__), 'sql/DDL.sql'), cursor=cursor)
+            executeScriptsFromFile(path.join(path.dirname(__file__), 'sql/DML.sql'), cursor=cursor)
         context = super().get_context_data(**kwargs)
         return context

@@ -8,12 +8,13 @@ class TestForm(forms.Form):
     """Test form for tereny table """
     name = forms.CharField(
         max_length=100,
-        label="Nazwa terenu "
+        label="Nazwa terenu"
     )
+    
     description = forms.CharField(
         widget=forms.Textarea,
         max_length=1000,
-        label="Krótki opis "
+        label="Krótki opis"
     )
     
     def save_record(self):

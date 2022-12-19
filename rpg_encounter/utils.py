@@ -20,5 +20,5 @@ def executeScriptsFromFile(filename, cursor):
         # the DROP TABLE commands
         try:
             cursor.execute(command)
-        except Exception:
-            print("Command skipped")
+        except Exception as ex:
+            print("Command skipped", ex)
