@@ -1,6 +1,6 @@
 from django import forms
 from os import path
-from rpg_encounter.utils import executeScriptsFromFile, saveData, getData
+from rpg_encounter.sql_utils import executeScriptsFromFile, saveData, getIdName
 
 
 class TerrainForm(forms.Form):
@@ -33,7 +33,10 @@ class LocationForm(forms.Form):
         max_length=1000,
         label="Krótki opis"
     )
-    terrain = forms.ChoiceField(choices=getData("tereny"))
+    terrain = forms.ChoiceField(
+        choices=getIdName("tereny"),
+        label="Teren"
+    )
     
     def save_record(self):
         saveData("lokacje", 
@@ -41,5 +44,33 @@ class LocationForm(forms.Form):
                  opis=self.cleaned_data['description'], 
                  id_teren=self.cleaned_data['terrain'])
     
+    
+class TreasureForm(forms.Form):
+    """Form for encounters.skarby"""
+    name = forms.CharField(
+        max_length=100,
+        label="Nazwa skarbu"
+    )
+    description = forms.CharField(
+        widget=forms.Textarea,
+        max_length=1000,
+        label="Krótki opis"
+    )
+    rarity = forms.CharField(
+        max_length=100,
+        label="Rzadkość"
+    )
+    price = forms.IntegerField(
+        max_value=1000000,
+        min_value=0,
+        label="Wartość skarbu"
+    )
+    
+    def save_record(self):
+        saveData("skarby", 
+                 nazwa=self.cleaned_data['name'], 
+                 opis=self.cleaned_data['description'],
+                 rzadkosc=self.cleaned_data['rarity'],
+                 wartosc=self.cleaned_data['price'])
 
 

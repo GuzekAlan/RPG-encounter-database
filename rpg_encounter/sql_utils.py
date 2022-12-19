@@ -24,9 +24,14 @@ def executeScriptsFromFile(filename, cursor):
         except Exception as ex:
             print("Command skipped: ", ex)
             
-def getData(table_name):
+def getIdName(table_name):
     with connection.cursor() as cursor:
         cursor.execute("SELECT id, nazwa FROM encounters." + table_name)
+        return cursor.fetchall()
+    
+def getData(table_name, columns):
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT " + ",".join(columns) + " FROM encounters." + table_name)
         return cursor.fetchall()
     
 def saveData(table_name, **kwargs):

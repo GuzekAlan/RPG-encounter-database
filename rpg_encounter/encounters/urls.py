@@ -8,4 +8,6 @@ urlpatterns = [
     path('create_database', views.CreateDatabaseView.as_view(), name="create_database"),
     path('terrain_form', views.TerrainFormView.as_view(), name="terrain_form"),
     path('location_form', views.LocationFormView.as_view(), name="location_form"),
+    path('treasure_form', views.TreasureFormView.as_view(), name="treasure_form"),
+    path('terrain_table', views.TerrainTableView.as_view(), name="terrain_table"),
 ]

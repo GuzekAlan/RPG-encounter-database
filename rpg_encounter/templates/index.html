@@ -5,8 +5,14 @@
         <form action="{% url 'encounters:terrain_form' %}">
             <input type="submit" value="Dodaj Teren" />
         </form>
+        <form action="{% url 'encounters:terrain_table' %}">
+            <input type="submit" value="Pokaż Tereny" />
+        </form>
         <form action="{% url 'encounters:location_form' %}">
             <input type="submit" value="Dodaj Lokacje" />
+        </form>
+        <form action="{% url 'encounters:treasure_form' %}">
+            <input type="submit" value="Dodaj Skarb" />
         </form>
         <form action="{% url 'encounters:create_database' %}">
             <input type="submit" value="Create Database" />
