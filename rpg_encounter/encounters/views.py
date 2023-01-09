@@ -23,27 +23,48 @@ class SimpleTableView(TemplateView):
     template_name="encounters_table.html"
     
     table_name = ""
-    columns =[""]
+    dbColumns =["*"]
+    tableColumns = [""]
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['select'] = getData(self.table_name, self.columns)
-        context['column_names'] = self.columns
+        context['select'] = getData(self.table_name, self.dbColumns)
+        context['column_names'] = self.tableColumns
         return context
     
 class TerrainTableView(SimpleTableView):
-    table_name="tereny"
-    columns=['nazwa', 'opis']
+    table_name="tereny_widok"
+    tableColumns=["Nazwa Terenu", "Krótki opis"]
+
+class LocationTableView(SimpleTableView):
+    table_name="lokacje_widok" 
+    tableColumns=['Nazwa Lokacji', 'Krótki opis', 'Teren']
+
+class TreasureTableView(SimpleTableView):
+    table_name="skarby_widok"
+    tableColumns=["Nazwa Skarbu", "Krótki opis", "Rzadkość", "Wartość(g)"]
 
 # Form views
 
 class SimpleFormView(FormView):
     template_name="encounters_form.html"
     success_url='/'
-    
+    message = ""
+
+    def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context["message"] = self.message
+            return context
+
     def form_valid(self, form):
-        form.save_record()
-        return super().form_valid(form)
+        if not form.save_record():
+            return super().form_valid(form)
+        else:
+            self.message = "Podany rekord już istnieje"
+            return super().form_invalid(form)
+    def form_invalid(self, form):
+        return super().form_invalid(form)
+        
 
 class TerrainFormView(SimpleFormView):
     form_class=forms.TerrainForm

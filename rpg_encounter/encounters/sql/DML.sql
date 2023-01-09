@@ -23,11 +23,11 @@ INSERT INTO encounters.skarby(nazwa, opis, rzadkosc, wartosc) VALUES
     ('Skrzynia', 'Wielkie grube pudełko mające duuuużo złota', 'Pospolity', 200),
     ('Buty', 'Popularny średniowieczny środek transportu posiadający skórzaną tapicerkę', 'Pospolity', 3);
 
-INSERT INTO encounters.rasy(nazwa, opis, id_teren) VALUES 
-    ('Ludzie', 'Średniego rozmiaru bestie mówiące po Polsku i Angieslku. Nieprzyjemne typy', 2),
-    ('Syrenki', 'Piękne kobiety od pasa w górę, a od pasa w dół mają duży ogon. Pięknie śpiewają i zjadają marynarzy', 3),
-    ('Smoki', 'Dostojne gady, skrzydlate jak i ogniowładne. Kochają złoto', 1),
-    ('Gobliny', 'Małe stworzenia żyjące w wielkich skupiskach.', 2);
+INSERT INTO encounters.rasy(nazwa, opis) VALUES 
+    ('Ludzie', 'Średniego rozmiaru bestie mówiące po Polsku i Angieslku. Nieprzyjemne typy'),
+    ('Syrenki', 'Piękne kobiety od pasa w górę, a od pasa w dół mają duży ogon. Pięknie śpiewają i zjadają marynarzy'),
+    ('Smoki', 'Dostojne gady, skrzydlate jak i ogniowładne. Kochają złoto'),
+    ('Gobliny', 'Małe stworzenia żyjące w wielkich skupiskach.');
 
 INSERT INTO encounters.potwory(nazwa, opis, poziom_trudnosci, id_rasa) VALUES 
     ('Hobgoblin', 'Duży goblin. Ma maczugę. UgaUga.', 3, 4),

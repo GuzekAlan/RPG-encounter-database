@@ -10,4 +10,6 @@ urlpatterns = [
     path('location_form', views.LocationFormView.as_view(), name="location_form"),
     path('treasure_form', views.TreasureFormView.as_view(), name="treasure_form"),
     path('terrain_table', views.TerrainTableView.as_view(), name="terrain_table"),
+    path('location_table', views.LocationTableView.as_view(), name="location_table"),
+    path('treasure_table', views.TreasureTableView.as_view(), name="treasure_table"),
 ]

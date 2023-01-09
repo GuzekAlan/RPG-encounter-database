@@ -16,9 +16,10 @@ class TerrainForm(forms.Form):
     )
     
     def save_record(self):
-        saveData("tereny", 
+        return saveData("tereny", 
                  nazwa=self.cleaned_data['name'], 
                  opis=self.cleaned_data['description'])
+            
             
             
             
@@ -39,7 +40,7 @@ class LocationForm(forms.Form):
     )
     
     def save_record(self):
-        saveData("lokacje", 
+        return saveData("lokacje", 
                  nazwa=self.cleaned_data['name'], 
                  opis=self.cleaned_data['description'], 
                  id_teren=self.cleaned_data['terrain'])
@@ -67,7 +68,7 @@ class TreasureForm(forms.Form):
     )
     
     def save_record(self):
-        saveData("skarby", 
+        return saveData("skarby", 
                  nazwa=self.cleaned_data['name'], 
                  opis=self.cleaned_data['description'],
                  rzadkosc=self.cleaned_data['rarity'],

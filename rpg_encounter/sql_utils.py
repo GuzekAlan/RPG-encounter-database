@@ -1,6 +1,6 @@
-from django.db import connection
+from django.db import connection, IntegrityError
 
-def executeScriptsFromFile(filename, cursor):
+def executeScriptsFromFile(filename):
     """Stolen from StackOverflow function. It might not be the best but it works
     Args:
         filename string: absolute path to a file
@@ -29,7 +29,7 @@ def getIdName(table_name):
         cursor.execute("SELECT id, nazwa FROM encounters." + table_name)
         return cursor.fetchall()
     
-def getData(table_name, columns):
+def getData(table_name, columns='*'):
     with connection.cursor() as cursor:
         cursor.execute("SELECT " + ",".join(columns) + " FROM encounters." + table_name)
         return cursor.fetchall()
@@ -37,7 +37,9 @@ def getData(table_name, columns):
 def saveData(table_name, **kwargs):
     columns = list(kwargs.keys())
     values = list(kwargs.values())
-    print(columns)
-    print(values)
     with connection.cursor() as cursor:
-        cursor.execute("INSERT INTO encounters." + table_name + "(" + ",".join(columns) + ") VALUES(" + ",".join(["%s" for _ in range(len(columns))]) + ")", values)
+        try:
+            cursor.execute("INSERT INTO encounters." + table_name + "(" + ",".join(columns) + ") VALUES(" + ",".join(["%s" for _ in range(len(columns))]) + ")", values)
+            return 0
+        except IntegrityError:
+            return -1
