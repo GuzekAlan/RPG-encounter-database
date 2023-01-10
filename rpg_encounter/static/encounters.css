@@ -1,0 +1,79 @@
+:root{
+    --bgcolor: #BA3B46;
+    --bgcolor-dark: #87333a;
+    --primary-color: #faf3ea;
+    --border-color: #43c99e;
+    --link-color: #ed9b3e;
+    --secondary-color: #6b5a3f;
+}
+
+body{
+    background-color: var(--bgcolor);
+    color: var(--primary-color);
+    font-size: 20px;
+}
+
+table{
+    border: 2px solid var(--border-color);
+    border-collapse: collapse;
+    padding: 10px;
+}
+
+th, td {
+    text-align: left;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+}
+  
+th {
+    background-color: var(--bgcolor-dark);
+    border: 2px solid var(--border-color);
+    color: var(--primary-color);
+}
+
+form {
+    margin: 10px;
+    align-items: center;
+}
+
+form > div {
+    padding: 5px;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+}
+
+select, input[type=number], input[type=text], textarea {
+    background-color: var(--bgcolor-dark);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    font-size: 20px;
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+}
+
+a:hover {
+    color: var(--link-color)
+}
+
+input[type=submit] {
+    background-color: var(--primary-color);
+    border-color: var(--border-color);
+    color: var(--bgcolor);
+    font-size: 20px;
+}
+
+input[type=submit]:hover {
+    background-color: var(--link-color);
+    color: black;
+}
+
+.error {
+    color: var(--border-color);
+}

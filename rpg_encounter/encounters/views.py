@@ -1,17 +1,104 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.views.generic import TemplateView, FormView
+from rpg_encounter.encounters import forms
 from django.db import connection
-from rpg_encounter.utils import executeScriptsFromFile
+from rpg_encounter.sql_utils import executeScriptsFromFile, getData
 from os import path
 
 
-def index(request):
-    return HttpResponse("<h1>Welcome to RPG Encounter Database</h1>")
+class IndexView(TemplateView):
+    template_name="index.html"
+        
+class CreateDatabaseView(TemplateView):
+    template_name="create_database.html"
+    
+    def get_context_data(self, **kwargs):
+        executeScriptsFromFile(path.join(path.dirname(__file__), 'sql/DDL.sql'))
+        executeScriptsFromFile(path.join(path.dirname(__file__), 'sql/DML.sql'))
+        context = super().get_context_data(**kwargs)
+        return context
+    
+# Table views
 
-def create_database(request):
-    with connection.cursor() as cursor:
-        executeScriptsFromFile(path.join(path.dirname(__file__), 'sql/DDL.sql'), cursor=cursor)
-    return HttpResponse("Database structure created!")
+class SimpleTableView(TemplateView):
+    template_name="encounters_table.html"
+    
+    table_name = ""
+    dbColumns =["*"]
+    tableColumns = [""]
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['select'] = getData(self.table_name, self.dbColumns)
+        context['column_names'] = self.tableColumns
+        return context
+    
+class TerrainTableView(SimpleTableView):
+    table_name="tereny_widok"
+    tableColumns=["Nazwa Terenu", "Krótki opis"]
 
-def database(request):
-    return HttpResponse("Your request: " + request)
+class LocationTableView(SimpleTableView):
+    table_name="lokacje_widok" 
+    tableColumns=['Nazwa Lokacji', 'Krótki opis', 'Teren']
+
+class TreasureTableView(SimpleTableView):
+    table_name="skarby_widok"
+    tableColumns=["Nazwa Skarbu", "Krótki opis", "Rzadkość", "Wartość(g)"]
+
+class RaceTableView(SimpleTableView):
+    table_name="rasy_widok"
+    tableColumns=["Nazwa Rasy", "Krótki opis", "Zamieszkiwane tereny"]
+
+class MonsterTableView(SimpleTableView):
+    table_name="potwory_widok"
+    tableColumns=["Nazwa Potwora", "Krótki opis", "Poziom trudności", "Rasa", "Zamieszkiwane tereny"]
+
+class TrapTableView(SimpleTableView):
+    table_name="pulapki_widok"
+    tableColumns=["Nazwa Pułapki", "Krótki opis", "Poziom trudności"]
+
+class EncounterTableView(SimpleTableView):
+    table_name="potyczki_widok"
+    tableColumns=["Tytuł Potyczki", "Krótki opis", "Lokacja", "Potwory", "Pułapki", "Skarby", "Poziom Trudności"]
+
+# Form views
+
+class SimpleFormView(FormView):
+    template_name="encounters_form.html"
+    success_url='/'
+    message = ''
+
+    def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context["message"] = self.message
+            return context
+
+    def form_valid(self, form):
+        if not form.save_record():
+            return super().form_valid(form)
+        else:
+            self.message = "Podany rekord już istnieje"
+            return super().form_invalid(form)
+    def form_invalid(self, form):
+        return super().form_invalid(form)
+        
+
+class TerrainFormView(SimpleFormView):
+    form_class=forms.TerrainForm
+    
+class LocationFormView(SimpleFormView):
+    form_class=forms.LocationForm
+    
+class TreasureFormView(SimpleFormView):
+    form_class=forms.TreasureForm
+
+class RaceFormView(SimpleFormView):
+    form_class=forms.RaceForm
+
+class MonsterFormView(SimpleFormView):
+    form_class=forms.MonsterForm
+
+class TrapFormView(SimpleFormView):
+    form_class=forms.TrapForm
+
+class EncounterFormView(SimpleFormView):
+    form_class=forms.EncounterForm

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block content %}
+  <div>
+    <form method="post" novalidate>{% csrf_token %}
+      <div>
+        {% for field in form.visible_fields %}
+        <div class="form-row">
+          <div>
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          </div>
+          <div>
+            {{ field }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="submit-button">
+        <input type="submit" value="Zapisz">
+      </div>
+      <div class="error">
+        {{ message }}
+      </div>
+      <div>
+        <a href="/">Strona główna</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}
