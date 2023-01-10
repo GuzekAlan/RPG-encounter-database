@@ -44,12 +44,28 @@ class TreasureTableView(SimpleTableView):
     table_name="skarby_widok"
     tableColumns=["Nazwa Skarbu", "Krótki opis", "Rzadkość", "Wartość(g)"]
 
+class RaceTableView(SimpleTableView):
+    table_name="rasy_widok"
+    tableColumns=["Nazwa Rasy", "Krótki opis", "Zamieszkiwane tereny"]
+
+class MonsterTableView(SimpleTableView):
+    table_name="potwory_widok"
+    tableColumns=["Nazwa Potwora", "Krótki opis", "Poziom trudności", "Rasa", "Zamieszkiwane tereny"]
+
+class TrapTableView(SimpleTableView):
+    table_name="pulapki_widok"
+    tableColumns=["Nazwa Pułapki", "Krótki opis", "Poziom trudności"]
+
+class EncounterTableView(SimpleTableView):
+    table_name="potyczki_widok"
+    tableColumns=["Tytuł Potyczki", "Krótki opis", "Lokacja", "Potwory", "Pułapki", "Skarby", "Poziom Trudności"]
+
 # Form views
 
 class SimpleFormView(FormView):
     template_name="encounters_form.html"
     success_url='/'
-    message = ""
+    message = ''
 
     def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
@@ -74,3 +90,15 @@ class LocationFormView(SimpleFormView):
     
 class TreasureFormView(SimpleFormView):
     form_class=forms.TreasureForm
+
+class RaceFormView(SimpleFormView):
+    form_class=forms.RaceForm
+
+class MonsterFormView(SimpleFormView):
+    form_class=forms.MonsterForm
+
+class TrapFormView(SimpleFormView):
+    form_class=forms.TrapForm
+
+class EncounterFormView(SimpleFormView):
+    form_class=forms.EncounterForm

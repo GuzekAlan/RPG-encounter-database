@@ -20,6 +20,30 @@
         <form action="{% url 'encounters:treasure_table' %}">
             <input type="submit" value="Pokaż Skarby" />
         </form>
+        <form action="{% url 'encounters:trap_form' %}">
+            <input type="submit" value="Dodaj Pułapkę" />
+        </form>
+        <form action="{% url 'encounters:trap_table' %}">
+            <input type="submit" value="Pokaż Pułapki" />
+        </form>
+        <form action="{% url 'encounters:race_form' %}">
+            <input type="submit" value="Dodaj Rasę" />
+        </form>
+        <form action="{% url 'encounters:race_table' %}">
+            <input type="submit" value="Pokaż Rasy" />
+        </form>
+        <form action="{% url 'encounters:monster_form' %}">
+            <input type="submit" value="Dodaj Potwora" />
+        </form>
+        <form action="{% url 'encounters:monster_table' %}">
+            <input type="submit" value="Pokaż Potwory" />
+        </form>
+        <form action="{% url 'encounters:encounter_form' %}">
+            <input type="submit" value="Dodaj Potyczkę" />
+        </form>
+        <form action="{% url 'encounters:encounter_table' %}">
+            <input type="submit" value="Pokaż Potyczki" />
+        </form>
         <form action="{% url 'encounters:create_database' %}">
             <input type="submit" value="Create Database" />
         </form>

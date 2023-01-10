@@ -20,7 +20,7 @@ CREATE TABLE encounters.potyczki(
     "tytul" VARCHAR(100) NOT NULL,
     "opis" VARCHAR(1000) NOT NULL,
     "id_lokacja" INTEGER NOT NULL,
-    "id_tworca" INTEGER NOT NULL
+    "id_tworca" INTEGER
 );
 -- Skarby
 CREATE TABLE encounters.skarby(
@@ -115,12 +115,93 @@ ALTER TABLE encounters.rasa_teren
 
 -- widoki
 CREATE OR REPLACE VIEW encounters.tereny_widok AS
-    SELECT nazwa, opis FROM encounters.tereny;
+    SELECT nazwa, opis 
+        FROM encounters.tereny
+        ORDER BY 1 ASC;
 
 CREATE OR REPLACE VIEW encounters.skarby_widok AS
-    SELECT nazwa, opis, rzadkosc, wartosc FROM encounters.skarby;
+    SELECT nazwa, opis, rzadkosc, wartosc 
+        FROM encounters.skarby
+        ORDER BY 4 DESC, 1 ASC;
 
 CREATE OR REPLACE VIEW encounters.lokacje_widok AS
-    SELECT L.nazwa AS "Nazwa", L.opis AS "Opis", T.nazwa AS "Teren"
+    SELECT L.nazwa, L.opis, T.nazwa AS "teren"
         FROM encounters.lokacje L JOIN encounters.tereny T ON L.id_teren=T.id
         ORDER BY 1 ASC;
+
+CREATE OR REPLACE VIEW encounters.rasy_widok AS
+    SELECT R.nazwa, R.opis, STRING_AGG(T.nazwa, ',') as "tereny"
+        FROM encounters.rasy R LEFT JOIN encounters.rasa_teren RT ON RT.id_rasa=R.id
+        JOIN encounters.tereny T ON RT.id_teren=T.id
+        GROUP BY R.id
+        ORDER BY 1 ASC;
+
+CREATE OR REPLACE VIEW encounters.potwory_widok AS
+    SELECT P.nazwa, P.opis, P.poziom_trudnosci, R.nazwa AS "rasa", STRING_AGG(T.nazwa, ',') as "tereny"
+        FROM encounters.potwory P JOIN encounters.rasy R ON P.id_rasa=R.id
+        LEFT JOIN encounters.rasa_teren RT ON RT.id_rasa=R.id
+        JOIN encounters.tereny T ON RT.id_teren=T.id
+        GROUP BY P.id, R.id
+        ORDER BY 3 DESC, 1 ASC;
+
+CREATE OR REPLACE VIEW encounters.pulapki_widok AS
+    SELECT nazwa, opis, poziom_trudnosci
+        FROM encounters.pulapki
+        ORDER BY 3 DESC;
+
+CREATE OR REPLACE VIEW encounters.poziom_trudnosci AS
+    SELECT P.id, SUM(Pot.poziom_trudnosci + Pul.poziom_trudnosci) AS poziom
+        FROM encounters.potyczki P
+            LEFT JOIN encounters.potwor_potyczka PotP ON PotP.id_potyczka=P.id
+            JOIN encounters.potwory Pot ON Pot.id=PotP.id_potwor
+            LEFT JOIN encounters.pulapka_potyczka PulP ON PulP.id_potyczka=P.id
+            JOIN encounters.pulapki Pul ON Pul.id=PulP.id_pulapka
+        GROUP BY P.id;
+
+CREATE OR REPLACE VIEW encounters.potyczki_pulapki_widok AS
+    SELECT P.id, STRING_AGG(Pul.nazwa, ',') AS "pulapki"
+        FROM encounters.potyczki P 
+            LEFT JOIN encounters.pulapka_potyczka PulP ON PulP.id_potyczka=P.id
+            JOIN encounters.pulapki Pul ON Pul.id=PulP.id_pulapka
+        GROUP BY P.id;
+
+CREATE OR REPLACE VIEW encounters.potyczki_potwory_widok AS
+    SELECT P.id, STRING_AGG(Pot.nazwa, ',') AS "potwory"
+        FROM encounters.potyczki P 
+            LEFT JOIN encounters.potwor_potyczka PotP ON PotP.id_potyczka=P.id
+            JOIN encounters.potwory Pot ON Pot.id=PotP.id_potwor
+        GROUP BY P.id;
+
+CREATE OR REPLACE VIEW encounters.potyczki_skarby_widok AS
+    SELECT P.id, STRING_AGG(S.nazwa, ',') AS "skarby"
+        FROM encounters.potyczki P 
+            LEFT JOIN encounters.skarb_potyczka SP ON SP.id_potyczka=P.id
+            JOIN encounters.skarby S ON S.id=SP.id_skarb
+        GROUP BY P.id;
+    
+        
+CREATE OR REPLACE VIEW encounters.potyczki_widok AS
+    SELECT P.tytul, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom
+        FROM encounters.potyczki P 
+            LEFT JOIN encounters.lokacje L ON P.id_lokacja=L.id
+            LEFT JOIN encounters.potyczki_potwory_widok Pot ON Pot.id=P.id
+            LEFT JOIN encounters.potyczki_pulapki_widok Pul ON Pul.id=P.id
+            LEFT JOIN encounters.potyczki_skarby_widok S ON S.id=P.id           
+            LEFT JOIN encounters.poziom_trudnosci PT ON PT.id=P.id
+        ORDER BY 1 ASC;
+
+-- Wyzwalacze
+CREATE OR REPLACE FUNCTION rzadkosc_skarbu_funkcja()
+    RETURNS TRIGGER
+    AS $$
+    BEGIN
+        NEW.rzadkosc := UPPER(NEW.rzadkosc);
+        RETURN NEW;
+    END;
+    $$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER rzadkosc_skarbu_wyzwalacz
+    BEFORE INSERT OR UPDATE ON encounters.skarby
+    FOR EACH ROW 
+    EXECUTE PROCEDURE rzadkosc_skarbu_funkcja();
+    

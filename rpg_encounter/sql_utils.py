@@ -10,19 +10,10 @@ def executeScriptsFromFile(filename):
     fd = open(filename, 'r')
     sqlFile = fd.read()
     fd.close()
-
-    # all SQL commands (split on ';')
-    sqlCommands = sqlFile.split(';')
-
-    # Execute every command from the input file
-    for command in sqlCommands:
-        # This will skip and report errors
-        # For example, if the tables do not yet exist, this will skip over
-        # the DROP TABLE commands
-        try:
-            cursor.execute(command)
-        except Exception as ex:
-            print("Command skipped: ", ex)
+    try:
+        cursor.execute(sqlFile)
+    except Exception as ex:
+        print("Command skipped: ", ex)
             
 def getIdName(table_name):
     with connection.cursor() as cursor:
@@ -41,5 +32,23 @@ def saveData(table_name, **kwargs):
         try:
             cursor.execute("INSERT INTO encounters." + table_name + "(" + ",".join(columns) + ") VALUES(" + ",".join(["%s" for _ in range(len(columns))]) + ")", values)
             return 0
-        except IntegrityError:
+        except IntegrityError as err:
+            print(err)
             return -1
+
+def connectManyToMany(table_name, idsLeft, idsRight):
+    idLeftName = 'id_' + table_name.split('_')[0]
+    idRightName = 'id_' + table_name.split('_')[1]
+    with connection.cursor() as cursor:
+        for idLeft in idsLeft:
+            for idRight in idsRight:
+                try:
+                    cursor.execute(f'INSERT INTO encounters.{table_name} ({idLeftName}, {idRightName})' +  "VALUES (%s, %s)", [idLeft, idRight])
+                except IntegrityError as err:
+                    print(err)
+                    return -1
+
+def getMaxIndex(table_name):
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT MAX(id) FROM encounters." + table_name)
+        return cursor.fetchone()

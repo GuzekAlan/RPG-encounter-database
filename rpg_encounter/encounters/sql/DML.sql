@@ -29,6 +29,14 @@ INSERT INTO encounters.rasy(nazwa, opis) VALUES
     ('Smoki', 'Dostojne gady, skrzydlate jak i ogniowładne. Kochają złoto'),
     ('Gobliny', 'Małe stworzenia żyjące w wielkich skupiskach.');
 
+INSERT INTO encounters.rasa_teren VALUES
+    (1, 1),
+    (1, 2),
+    (2, 3),
+    (3, 1),
+    (4, 1),
+    (4, 2);
+
 INSERT INTO encounters.potwory(nazwa, opis, poziom_trudnosci, id_rasa) VALUES 
     ('Hobgoblin', 'Duży goblin. Ma maczugę. UgaUga.', 3, 4),
     ('Wywerna', 'Mały nierozwinięty smok, który nie potrafi zionąć ogniem', 4, 3),
