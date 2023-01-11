@@ -44,6 +44,7 @@ def connectManyToMany(table_name, idsLeft, idsRight):
             for idRight in idsRight:
                 try:
                     cursor.execute(f'INSERT INTO encounters.{table_name} ({idLeftName}, {idRightName})' +  "VALUES (%s, %s)", [idLeft, idRight])
+                    return 0
                 except IntegrityError as err:
                     print(err)
                     return -1
@@ -52,3 +53,15 @@ def getMaxIndex(table_name):
     with connection.cursor() as cursor:
         cursor.execute("SELECT MAX(id) FROM encounters." + table_name)
         return cursor.fetchone()
+
+def checkUser(login, password):
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute("SELECT haslo FROM encounters.osoby WHERE login=%s", [login] ) 
+            data = cursor.fetchone()
+            if data == password:
+                return 0
+            return -2
+        except IntegrityError as err:
+            print(err)
+            return -1

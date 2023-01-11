@@ -42,4 +42,18 @@ INSERT INTO encounters.potwory(nazwa, opis, poziom_trudnosci, id_rasa) VALUES
     ('Wywerna', 'Mały nierozwinięty smok, który nie potrafi zionąć ogniem', 4, 3),
     ('Mała Syrenka', 'W sumie to nie potwór ale księżniczka ale nadal obrażenia zadawać może', 1, 2);
 
+INSERT INTO encounters.uprawnienia(tabela, typ) VALUES
+    ('tereny', 'odczyt'),
+    ('tereny', 'zapis'),
+    ('rasy', 'odczyt'),
+    ('rasy', 'zapis'),
+    ('potwory', 'odczyt'),
+    ('potwory', 'zapis'),
+    ('lokacje', 'odczyt'),
+    ('lokacje', 'zapis'),
+    ('skarby', 'odczyt'),
+    ('skarby', 'zapis'),
+    ('pulapki', 'odczyt'),
+    ('pulapki', 'zapis');
+
 COMMIT;

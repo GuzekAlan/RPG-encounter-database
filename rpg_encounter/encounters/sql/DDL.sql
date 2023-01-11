@@ -17,7 +17,7 @@ CREATE TABLE encounters.tereny(
 -- Potyczki
 CREATE TABLE encounters.potyczki(
     "id" SERIAL PRIMARY KEY,
-    "tytul" VARCHAR(100) NOT NULL,
+    "tytul" VARCHAR(100) UNIQUE NOT NULL,
     "opis" VARCHAR(1000) NOT NULL,
     "id_lokacja" INTEGER NOT NULL,
     "id_tworca" INTEGER
@@ -46,21 +46,21 @@ CREATE TABLE encounters.lokacje(
 -- Pułapki
 CREATE TABLE encounters.pulapki(
     "id" SERIAL PRIMARY KEY,
-    "nazwa" VARCHAR(100) NOT NULL,
+    "nazwa" VARCHAR(100) UNIQUE NOT NULL,
     "opis" VARCHAR(1000) NOT NULL,
     "poziom_trudnosci" INTEGER NOT NULL
 );
 -- Osoby
 CREATE TABLE encounters.osoby(
     "id" SERIAL PRIMARY KEY,
-    "nazwa" VARCHAR(100) NOT NULL,
-    "login" VARCHAR(50) NOT NULL,
+    "nazwa" VARCHAR(100) UNIQUE NOT NULL,
+    "login" VARCHAR(50) UNIQUE NOT NULL,
     "haslo" VARCHAR(50) NOT NULL
 );
 -- Uprawnienia
 CREATE TABLE encounters.uprawnienia(
     "id" SERIAL PRIMARY KEY,
-    "nazwa" VARCHAR(100) NOT NULL,
+    "tabela" VARCHAR(100) NOT NULL,
     "typ" VARCHAR(100) NOT NULL
 );
 -- pulapka - Potyczka

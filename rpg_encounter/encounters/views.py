@@ -73,11 +73,16 @@ class SimpleFormView(FormView):
             return context
 
     def form_valid(self, form):
-        if not form.save_record():
+        response = form.save_record()
+        if response == 0:
             return super().form_valid(form)
         else:
-            self.message = "Podany rekord już istnieje"
+            if response == -1:
+                self.message = "Podany rekord już istnieje"
+            if response == -2:
+                self.message = "Login lub hasło są niepoprawne"
             return super().form_invalid(form)
+        
     def form_invalid(self, form):
         return super().form_invalid(form)
         
@@ -102,3 +107,9 @@ class TrapFormView(SimpleFormView):
 
 class EncounterFormView(SimpleFormView):
     form_class=forms.EncounterForm
+
+class UserRegisterFormView(SimpleFormView):
+    form_class=forms.UserRegisterForm
+
+class UserLoginFormView(SimpleFormView):
+    form_class=forms.UserLoginForm

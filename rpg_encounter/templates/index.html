@@ -44,8 +44,15 @@
         <form action="{% url 'encounters:encounter_table' %}">
             <input type="submit" value="Pokaż Potyczki" />
         </form>
+        ----------------------------------------------
         <form action="{% url 'encounters:create_database' %}">
-            <input type="submit" value="Create Database" />
+            <input type="submit" value="Stwórz Bazę Danych" />
+        </form>
+        <form action="{% url 'encounters:register' %}">
+            <input type="submit" value="Zarejestruj się" />
+        </form>
+        <form action="{% url 'encounters:login' %}">
+            <input type="submit" value="Zaloguj się" />
         </form>
     </div>
 {% endblock %}

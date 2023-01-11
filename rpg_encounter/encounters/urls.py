@@ -20,4 +20,6 @@ urlpatterns = [
     path('monster_table', views.MonsterTableView.as_view(), name="monster_table"),
     path('trap_table', views.TrapTableView.as_view(), name="trap_table"),
     path('encounter_table', views.EncounterTableView.as_view(), name="encounter_table"),
+    path('register', views.UserRegisterFormView.as_view(), name="register"),
+    path('login', views.UserLoginFormView.as_view(), name="login"),
 ]
