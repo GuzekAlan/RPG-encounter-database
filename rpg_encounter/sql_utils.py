@@ -66,10 +66,35 @@ def check_user(login, password):
         try:
             cursor.execute("SELECT nazwa, haslo FROM encounters.osoby WHERE login=%s", [login])
             data = cursor.fetchone()
-            print(data)
+            if not data:
+                return None
             if data[1] == password:
                 return data[0]
             return None
+        except IntegrityError as err:
+            print(err)
+            return None
+
+
+def get_user_id(username):
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute("SELECT id FROM encounters.osoby WHERE nazwa=%s", [username])
+            data = cursor.fetchone()
+            if data:
+                return data[0]
+        except IntegrityError as err:
+            print(err)
+            return None
+
+
+def get_encounter_by_creator(username):
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute("SELECT * FROM encounters.potyczki_widok WHERE tworca=%s", [username])
+            data = cursor.fetchall()
+            if data:
+                return data
         except IntegrityError as err:
             print(err)
             return None

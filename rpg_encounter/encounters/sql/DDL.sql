@@ -57,12 +57,6 @@ CREATE TABLE encounters.osoby(
     "login" VARCHAR(50) UNIQUE NOT NULL,
     "haslo" VARCHAR(50) NOT NULL
 );
--- Uprawnienia
-CREATE TABLE encounters.uprawnienia(
-    "id" SERIAL PRIMARY KEY,
-    "tabela" VARCHAR(100) NOT NULL,
-    "typ" VARCHAR(100) NOT NULL
-);
 -- pulapka - Potyczka
 CREATE TABLE encounters.pulapka_potyczka(
     "id_potyczka" INTEGER NOT NULL,
@@ -77,11 +71,6 @@ CREATE TABLE encounters.rasa_teren(
 CREATE TABLE encounters.skarb_potyczka(
     "id_potyczka" INTEGER NOT NULL,
     "id_skarb" INTEGER NOT NULL
-);
--- Uprawnienia - Osoby
-CREATE TABLE encounters.uprawnienia_osoby(
-    "id_uprawniennie" INTEGER NOT NULL,
-    "id_osoba" INTEGER NOT NULL
 );
 -- Potwór - Potyczka
 CREATE TABLE encounters.potwor_potyczka(
@@ -106,10 +95,7 @@ ALTER TABLE encounters.skarb_potyczka
 ALTER TABLE encounters.pulapka_potyczka 
     ADD CONSTRAINT "pulapka_potyczka_id_potyczka_foreign" FOREIGN KEY("id_potyczka") REFERENCES encounters.potyczki("id"),
     ADD CONSTRAINT "pulapka_potyczka_id_pulapka_foreign" FOREIGN KEY("id_pulapka") REFERENCES encounters.pulapki("id");
-ALTER TABLE encounters.uprawnienia_osoby 
-    ADD CONSTRAINT "uprawnienia_osoby_id_uprawniennie_foreign" FOREIGN KEY("id_uprawniennie") REFERENCES encounters.uprawnienia("id"),
-    ADD CONSTRAINT "uprawnienia_osoby_id_osoba_foreign" FOREIGN KEY("id_osoba") REFERENCES encounters.osoby("id");
-ALTER TABLE encounters.rasa_teren 
+ALTER TABLE encounters.rasa_teren
     ADD CONSTRAINT "rasa_teren_id_rasa_foreign" FOREIGN KEY("id_rasa") REFERENCES encounters.rasy("id"),
     ADD CONSTRAINT "rasa_teren_id_teren_foreign" FOREIGN KEY("id_teren") REFERENCES encounters.tereny("id");
 
@@ -181,13 +167,14 @@ CREATE OR REPLACE VIEW encounters.potyczki_skarby_widok AS
     
         
 CREATE OR REPLACE VIEW encounters.potyczki_widok AS
-    SELECT P.tytul, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom
+    SELECT P.tytul, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom, T.nazwa AS "tworca"
         FROM encounters.potyczki P 
             LEFT JOIN encounters.lokacje L ON P.id_lokacja=L.id
             LEFT JOIN encounters.potyczki_potwory_widok Pot ON Pot.id=P.id
             LEFT JOIN encounters.potyczki_pulapki_widok Pul ON Pul.id=P.id
             LEFT JOIN encounters.potyczki_skarby_widok S ON S.id=P.id           
             LEFT JOIN encounters.poziom_trudnosci PT ON PT.id=P.id
+            LEFT JOIN encounters.osoby T ON T.id=P.id_tworca
         ORDER BY 1 ASC;
 
 -- Wyzwalacze
@@ -204,4 +191,3 @@ CREATE TRIGGER rzadkosc_skarbu_wyzwalacz
     BEFORE INSERT OR UPDATE ON encounters.skarby
     FOR EACH ROW 
     EXECUTE PROCEDURE rzadkosc_skarbu_funkcja();
-    

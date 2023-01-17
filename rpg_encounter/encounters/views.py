@@ -2,7 +2,7 @@ from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView, FormView, View
 from rpg_encounter.encounters import forms
 from django.db import connection
-from rpg_encounter.sql_utils import execute_scripts_from_file, get_data
+from rpg_encounter.sql_utils import execute_scripts_from_file, get_data, get_encounter_by_creator
 from os import path
 
 
@@ -11,7 +11,7 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["username"] = self.request.get_signed_cookie(key="auth", default="")
+        context["username"] = self.request.get_signed_cookie(key="auth", default=None)
         return context
 
 
@@ -20,7 +20,9 @@ class CreateDatabaseView(TemplateView):
 
     def get_context_data(self, **kwargs):
         execute_scripts_from_file(path.join(path.dirname(__file__), "sql/DDL.sql"))
+        print("DDL EXECUTED")
         execute_scripts_from_file(path.join(path.dirname(__file__), "sql/DML.sql"))
+        print("DML EXECUTED")
         context = super().get_context_data(**kwargs)
         return context
 
@@ -78,8 +80,8 @@ class TrapTableView(SimpleTableView):
     tableColumns = ["Nazwa Pułapki", "Krótki opis", "Poziom trudności"]
 
 
-class EncounterTableView(SimpleTableView):
-    table_name = "potyczki_widok"
+class EncounterTableView(TemplateView):
+    template_name = "encounters_table.html"
     tableColumns = [
         "Tytuł Potyczki",
         "Krótki opis",
@@ -88,7 +90,16 @@ class EncounterTableView(SimpleTableView):
         "Pułapki",
         "Skarby",
         "Poziom Trudności",
+        "Nazwa twórcy",
     ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["select"] = get_encounter_by_creator(self.request.get_signed_cookie("auth", default=None))
+        context["column_names"] = self.tableColumns
+        return context
+
+
 
 
 # Form views
@@ -145,6 +156,16 @@ class TrapFormView(SimpleFormView):
 
 class EncounterFormView(SimpleFormView):
     form_class = forms.EncounterForm
+
+    def get_form_kwargs(self):
+        kw = super(EncounterFormView, self).get_form_kwargs()
+        kw['request'] = self.request
+        return kw
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["username"] = self.request.get_signed_cookie(key="auth", default=None)
+        return context
 
 
 class UserRegisterFormView(SimpleFormView):
