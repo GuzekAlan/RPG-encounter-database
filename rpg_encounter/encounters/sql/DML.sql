@@ -56,4 +56,6 @@ INSERT INTO encounters.uprawnienia(tabela, typ) VALUES
     ('pulapki', 'odczyt'),
     ('pulapki', 'zapis');
 
+INSERT INTO encounters.osoby(nazwa, login, haslo) VALUES ('ADMIN', 'ADMIN', 'ADMIN');
+
 COMMIT;
