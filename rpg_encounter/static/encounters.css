@@ -46,7 +46,7 @@ form > div {
     padding: 5px;
 }
 
-select, input[type=number], input[type=text], textarea {
+select, input[type=number], input[type=text], input[type=password], textarea {
     background-color: var(--bgcolor-dark);
     border-color: var(--primary-color);
     color: var(--primary-color);

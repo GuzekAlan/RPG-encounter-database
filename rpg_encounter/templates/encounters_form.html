@@ -3,7 +3,7 @@
 
 {% block content %}
   <div>
-    <form method="post" novalidate>{% csrf_token %}
+    <form method="post">{% csrf_token %}
       <div>
         {% for field in form.visible_fields %}
         <div class="form-row">

@@ -1,51 +1,80 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    {% if username %}
+    <h1>Hello {{ username }}</h1>
+    {% endif %}
     <div>
-        <form action="{% url 'encounters:terrain_form' %}">
-            <input type="submit" value="Dodaj Teren" />
+    <form action="{% url 'encounters:create_database' %}">
+            <input type="submit" value="Stwórz Bazę Danych" />
         </form>
+        {% if username %}
+            <form action="{% url 'encounters:logout' %}">
+            <input type="submit" value="Wyloguj się" />
+        </form>
+        {% else %}
+            <form action="{% url 'encounters:register' %}">
+                <input type="submit" value="Zarejestruj się" />
+            </form>
+            <form action="{% url 'encounters:login' %}">
+                <input type="submit" value="Zaloguj się" />
+            </form>
+        {% endif %}
+        ----------------------------------------------
+        {% if username == "ADMIN" %}
+            <h3>Dodaj elementy potyczki</h3>
+            <form action="{% url 'encounters:terrain_form' %}">
+                <input type="submit" value="Dodaj Teren" />
+            </form>
+            <form action="{% url 'encounters:location_form' %}">
+                <input type="submit" value="Dodaj Lokację" />
+            </form>
+            <form action="{% url 'encounters:treasure_form' %}">
+                <input type="submit" value="Dodaj Skarb" />
+            </form>
+            <form action="{% url 'encounters:trap_form' %}">
+                <input type="submit" value="Dodaj Pułapkę" />
+            </form>
+            <form action="{% url 'encounters:race_form' %}">
+                <input type="submit" value="Dodaj Rasę" />
+            </form>
+            <form action="{% url 'encounters:monster_form' %}">
+                <input type="submit" value="Dodaj Potwora" />
+            </form>
+            ----------------------------------------------
+        {% endif %}
+        <h3>Zobacz elementy potyczki</h3>
         <form action="{% url 'encounters:terrain_table' %}">
             <input type="submit" value="Pokaż Tereny" />
         </form>
-        <form action="{% url 'encounters:location_form' %}">
-            <input type="submit" value="Dodaj Lokację" />
-        </form>
+
         <form action="{% url 'encounters:location_table' %}">
             <input type="submit" value="Pokaż Lokacje" />
         </form>
-        <form action="{% url 'encounters:treasure_form' %}">
-            <input type="submit" value="Dodaj Skarb" />
-        </form>
+
         <form action="{% url 'encounters:treasure_table' %}">
             <input type="submit" value="Pokaż Skarby" />
         </form>
-        <form action="{% url 'encounters:trap_form' %}">
-            <input type="submit" value="Dodaj Pułapkę" />
-        </form>
+
         <form action="{% url 'encounters:trap_table' %}">
             <input type="submit" value="Pokaż Pułapki" />
         </form>
-        <form action="{% url 'encounters:race_form' %}">
-            <input type="submit" value="Dodaj Rasę" />
-        </form>
+
         <form action="{% url 'encounters:race_table' %}">
             <input type="submit" value="Pokaż Rasy" />
         </form>
-        <form action="{% url 'encounters:monster_form' %}">
-            <input type="submit" value="Dodaj Potwora" />
-        </form>
+
         <form action="{% url 'encounters:monster_table' %}">
             <input type="submit" value="Pokaż Potwory" />
         </form>
+
+        ----------------------------------------------
+        <h3>Zarządzaj swoimi potyczkami</h3>
         <form action="{% url 'encounters:encounter_form' %}">
             <input type="submit" value="Dodaj Potyczkę" />
         </form>
         <form action="{% url 'encounters:encounter_table' %}">
             <input type="submit" value="Pokaż Potyczki" />
-        </form>
-        <form action="{% url 'encounters:create_database' %}">
-            <input type="submit" value="Create Database" />
         </form>
     </div>
 {% endblock %}
