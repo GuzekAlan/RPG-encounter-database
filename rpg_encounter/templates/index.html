@@ -2,7 +2,7 @@
 
 {% block content %}
     {% if username %}
-    <h1>Hello {{ username }}</h1>
+    <h1>Witaj {{ username }}</h1>
     {% endif %}
     <div>
     <form action="{% url 'encounters:create_database' %}">
