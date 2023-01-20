@@ -23,6 +23,10 @@ def get_id_name(table_name):
         cursor.execute("SELECT id, nazwa FROM encounters." + table_name + " ORDER BY nazwa ASC;")
         return cursor.fetchall()
 
+def get_id_name_encounter(name):
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id, nazwa FROM encounters.pokaz_potyczki(%s) ORDER BY nazwa ASC;", [name])
+        return cursor.fetchall()
 
 def get_data(table_name, columns='*'):
     with connection.cursor() as cursor:
@@ -92,7 +96,7 @@ def get_user_id(username):
 def get_encounter_by_creator(username):
     with connection.cursor() as cursor:
         try:
-            cursor.execute("SELECT * FROM encounters.potyczki_widok WHERE tworca=%s", [username])
+            cursor.execute("SELECT * FROM encounters.pokaz_potyczki(%s)", [username])
             data = cursor.fetchall()
             if data:
                 return data
@@ -103,7 +107,7 @@ def get_encounter_by_creator(username):
 def delete_from_table(table_name, id_value):
     with connection.cursor() as cursor:
         try:
-            cursor.execute("SELECT usun_"+table_name+" (CAST(%s AS BIGINT));", [id_value])
+            cursor.execute("DELETE FROM encounters."+table_name+" WHERE id=(CAST(%s AS BIGINT))", [id_value])
             return True
         except IntegrityError as err:
             print(err)
@@ -112,7 +116,7 @@ def delete_from_table(table_name, id_value):
 def delete_encounter(id_record, username):
     with connection.cursor() as cursor:
         try:
-            cursor.execute("SELECT usun_potyczke(CAST(%s AS BIGINT[]), %s)", [id_record, username])
+            cursor.execute("SELECT usun_potyczke(CAST(%s AS BIGINT), %s)", [id_record, username])
             print(f"Usunięto {id_record=}")
         except IntegrityError as err:
             print(err)

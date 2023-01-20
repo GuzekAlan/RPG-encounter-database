@@ -79,25 +79,73 @@ CREATE TABLE encounters.potwor_potyczka(
 );
 
 -- Klucze obce
-ALTER TABLE encounters.potwory 
-    ADD CONSTRAINT "potwory_id_rasa_foreign" FOREIGN KEY("id_rasa") REFERENCES encounters.rasy("id");
+ALTER TABLE encounters.potwory
+    ADD CONSTRAINT "potwory_id_rasa_foreign"
+        FOREIGN KEY("id_rasa")
+        REFERENCES encounters.rasy("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE;
 ALTER TABLE encounters.potyczki 
-    ADD CONSTRAINT "potyczki_id_lokacja_foreign" FOREIGN KEY("id_lokacja") REFERENCES encounters.lokacje("id"),
-    ADD CONSTRAINT "potyczki_id_tworca_foreign" FOREIGN KEY("id_tworca") REFERENCES encounters.osoby("id");
+    ADD CONSTRAINT "potyczki_id_lokacja_foreign"
+        FOREIGN KEY("id_lokacja")
+        REFERENCES encounters.lokacje("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE,
+    ADD CONSTRAINT "potyczki_id_tworca_foreign"
+        FOREIGN KEY("id_tworca")
+        REFERENCES encounters.osoby("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE;
 ALTER TABLE encounters.lokacje 
-    ADD CONSTRAINT "lokacje_id_teren_foreign" FOREIGN KEY("id_teren") REFERENCES encounters.tereny("id");
+    ADD CONSTRAINT "lokacje_id_teren_foreign"
+        FOREIGN KEY("id_teren")
+        REFERENCES encounters.tereny("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE;
 ALTER TABLE encounters.potwor_potyczka 
-    ADD CONSTRAINT "potwor_potyczka_id_potyczka_foreign" FOREIGN KEY("id_potyczka") REFERENCES encounters.potyczki("id"),
-    ADD CONSTRAINT "potwor_potyczka_id_potwor_foreign" FOREIGN KEY("id_potwor") REFERENCES encounters.potwory("id");
+    ADD CONSTRAINT "potwor_potyczka_id_potyczka_foreign"
+        FOREIGN KEY("id_potyczka")
+        REFERENCES encounters.potyczki("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE,
+    ADD CONSTRAINT "potwor_potyczka_id_potwor_foreign"
+        FOREIGN KEY("id_potwor")
+        REFERENCES encounters.potwory("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE;
 ALTER TABLE encounters.skarb_potyczka 
-    ADD CONSTRAINT "skarb_potyczka_id_potyczka_foreign" FOREIGN KEY("id_potyczka") REFERENCES encounters.potyczki("id"),
-    ADD CONSTRAINT "skarb_potyczka_id_skarb_foreign" FOREIGN KEY("id_skarb") REFERENCES encounters.skarby("id");
+    ADD CONSTRAINT "skarb_potyczka_id_potyczka_foreign"
+        FOREIGN KEY("id_potyczka")
+        REFERENCES encounters.potyczki("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE,
+    ADD CONSTRAINT "skarb_potyczka_id_skarb_foreign"
+        FOREIGN KEY("id_skarb")
+        REFERENCES encounters.skarby("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE;
 ALTER TABLE encounters.pulapka_potyczka 
-    ADD CONSTRAINT "pulapka_potyczka_id_potyczka_foreign" FOREIGN KEY("id_potyczka") REFERENCES encounters.potyczki("id"),
-    ADD CONSTRAINT "pulapka_potyczka_id_pulapka_foreign" FOREIGN KEY("id_pulapka") REFERENCES encounters.pulapki("id");
+    ADD CONSTRAINT "pulapka_potyczka_id_potyczka_foreign"
+        FOREIGN KEY("id_potyczka")
+        REFERENCES encounters.potyczki("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE,
+    ADD CONSTRAINT "pulapka_potyczka_id_pulapka_foreign"
+        FOREIGN KEY("id_pulapka")
+        REFERENCES encounters.pulapki("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE;
 ALTER TABLE encounters.rasa_teren
-    ADD CONSTRAINT "rasa_teren_id_rasa_foreign" FOREIGN KEY("id_rasa") REFERENCES encounters.rasy("id"),
-    ADD CONSTRAINT "rasa_teren_id_teren_foreign" FOREIGN KEY("id_teren") REFERENCES encounters.tereny("id");
+    ADD CONSTRAINT "rasa_teren_id_rasa_foreign"
+        FOREIGN KEY("id_rasa")
+        REFERENCES encounters.rasy("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE,
+    ADD CONSTRAINT "rasa_teren_id_teren_foreign"
+        FOREIGN KEY("id_teren")
+        REFERENCES encounters.tereny("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE;
 
 -- widoki
 CREATE OR REPLACE VIEW encounters.tereny_widok AS
@@ -118,7 +166,7 @@ CREATE OR REPLACE VIEW encounters.lokacje_widok AS
 CREATE OR REPLACE VIEW encounters.rasy_widok AS
     SELECT R.nazwa, R.opis, STRING_AGG(T.nazwa, ',') as "tereny"
         FROM encounters.rasy R LEFT JOIN encounters.rasa_teren RT ON RT.id_rasa=R.id
-        JOIN encounters.tereny T ON RT.id_teren=T.id
+        LEFT JOIN encounters.tereny T ON RT.id_teren=T.id
         GROUP BY R.id
         ORDER BY 1 ASC;
 
@@ -126,7 +174,7 @@ CREATE OR REPLACE VIEW encounters.potwory_widok AS
     SELECT P.nazwa, P.opis, P.poziom_trudnosci, R.nazwa AS "rasa", STRING_AGG(T.nazwa, ',') as "tereny"
         FROM encounters.potwory P JOIN encounters.rasy R ON P.id_rasa=R.id
         LEFT JOIN encounters.rasa_teren RT ON RT.id_rasa=R.id
-        JOIN encounters.tereny T ON RT.id_teren=T.id
+        LEFT JOIN encounters.tereny T ON RT.id_teren=T.id
         GROUP BY P.id, R.id
         ORDER BY 3 DESC, 1 ASC;
 
@@ -164,18 +212,8 @@ CREATE OR REPLACE VIEW encounters.potyczki_skarby_widok AS
             LEFT JOIN encounters.skarb_potyczka SP ON SP.id_potyczka=P.id
             JOIN encounters.skarby S ON S.id=SP.id_skarb
         GROUP BY P.id;
-    
-        
-CREATE OR REPLACE VIEW encounters.potyczki_widok AS
-    SELECT P.nazwa, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom, T.nazwa AS "tworca"
-        FROM encounters.potyczki P 
-            LEFT JOIN encounters.lokacje L ON P.id_lokacja=L.id
-            LEFT JOIN encounters.potyczki_potwory_widok Pot ON Pot.id=P.id
-            LEFT JOIN encounters.potyczki_pulapki_widok Pul ON Pul.id=P.id
-            LEFT JOIN encounters.potyczki_skarby_widok S ON S.id=P.id           
-            LEFT JOIN encounters.poziom_trudnosci PT ON PT.id=P.id
-            LEFT JOIN encounters.osoby T ON T.id=P.id_tworca
-        ORDER BY 1 ASC;
+
+
 
 -- Wyzwalacze
 CREATE OR REPLACE FUNCTION rzadkosc_skarbu_funkcja()
@@ -194,88 +232,47 @@ CREATE TRIGGER rzadkosc_skarbu_wyzwalacz
 
 -- Funkcje
 
-CREATE OR REPLACE FUNCTION usun_potyczke(indexes BIGINT[], tworca VARCHAR)
+CREATE OR REPLACE FUNCTION usun_potyczke(index BIGINT, tworca VARCHAR)
     RETURNS VOID AS
     $$
-    DECLARE
-        index BIGINT;
     BEGIN
-        FOREACH index IN ARRAY indexes LOOP
             IF tworca = 'ADMIN' OR index IN
                 ( SELECT id FROM encounters.potyczki
                           WHERE id_tworca = (SELECT id FROM encounters.osoby WHERE nazwa = tworca) )
             THEN
-                DELETE FROM encounters.potwor_potyczka WHERE id_potyczka = index;
-                DELETE FROM encounters.skarb_potyczka WHERE id_potyczka = index;
-                DELETE FROM encounters.pulapka_potyczka WHERE id_potyczka = index;
                 DELETE FROM encounters.potyczki WHERE id = index;
             END IF;
-        END LOOP;
     END;
     $$ LANGUAGE plpgsql;
 
-
-CREATE OR REPLACE FUNCTION usun_skarby(index BIGINT)
-    RETURNS VOID AS
+CREATE OR REPLACE FUNCTION encounters.pokaz_potyczki(tworca VARCHAR)
+  RETURNS TABLE(nazwa VARCHAR, opis VARCHAR, lokacja VARCHAR, potwory TEXT, pulapki TEXT, skarby TEXT, pt BIGINT, t VARCHAR, id INTEGER) AS
     $$
     BEGIN
-        DELETE FROM encounters.skarb_potyczka WHERE id_skarb = $1;
-        DELETE FROM encounters.skarby WHERE id = $1;
-    END;
-    $$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION usun_pulapki(index BIGINT)
-    RETURNS VOID AS
-    $$
-    BEGIN
-        DELETE FROM encounters.pulapka_potyczka WHERE id_pulapka = $1;
-        DELETE FROM encounters.pulapki WHERE id = $1;
-    END;
-    $$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION usun_potwory(index BIGINT)
-    RETURNS VOID AS
-    $$
-    BEGIN
-        DELETE FROM encounters.potwor_potyczka WHERE id_potwor = $1;
-        DELETE FROM encounters.potwory WHERE id = $1;
-    END;
-    $$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION usun_lokacje(index BIGINT)
-    RETURNS VOID AS
-    $$
-    BEGIN
-        PERFORM usun_potyczke(ARRAY[$1], 'ADMIN');
-        DELETE FROM encounters.lokacje WHERE id = $1;
-    END;
-    $$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION usun_tereny(index BIGINT)
-    RETURNS VOID AS
-    $$
-    DECLARE
-        id_lokacja BIGINT;
-    BEGIN
-        FOR id_lokacja IN ( SELECT id FROM encounters.lokacje WHERE id_teren = $1 ) LOOP
-            PERFORM usun_lokacje(id_lokacja);
-        END LOOP;
-        DELETE FROM encounters.rasa_teren WHERE id_teren = $1;
-        DELETE FROM encounters.tereny WHERE id = $1;
-    END;
-    $$ LANGUAGE plpgsql;
-
-
-CREATE OR REPLACE FUNCTION usun_rasy(index BIGINT)
-    RETURNS VOID AS
-    $$
-    DECLARE
-        id_potwor BIGINT;
-    BEGIN
-        FOR id_potwor IN ( SELECT id FROM encounters.potwory WHERE id_rasa = $1 ) LOOP
-            PERFORM usun_potwory(id_potwor);
-        END LOOP;
-        DELETE FROM encounters.rasa_teren WHERE id_rasa = $1;
-        DELETE FROM encounters.rasy WHERE id = $1;
+            IF tworca = 'ADMIN'
+            THEN
+                RETURN QUERY
+                SELECT P.nazwa, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom, T.nazwa AS "tworca", P.id
+                    FROM encounters.potyczki P
+                        LEFT JOIN encounters.lokacje L ON P.id_lokacja=L.id
+                        LEFT JOIN encounters.potyczki_potwory_widok Pot ON Pot.id=P.id
+                        LEFT JOIN encounters.potyczki_pulapki_widok Pul ON Pul.id=P.id
+                        LEFT JOIN encounters.potyczki_skarby_widok S ON S.id=P.id
+                        LEFT JOIN encounters.poziom_trudnosci PT ON PT.id=P.id
+                        LEFT JOIN encounters.osoby T ON T.id=P.id_tworca
+                    ORDER BY 1 ASC ;
+            ELSE
+                RETURN QUERY
+                SELECT P.nazwa, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom, T.nazwa AS "tworca", P.id
+                    FROM encounters.potyczki P
+                        LEFT JOIN encounters.lokacje L ON P.id_lokacja=L.id
+                        LEFT JOIN encounters.potyczki_potwory_widok Pot ON Pot.id=P.id
+                        LEFT JOIN encounters.potyczki_pulapki_widok Pul ON Pul.id=P.id
+                        LEFT JOIN encounters.potyczki_skarby_widok S ON S.id=P.id
+                        LEFT JOIN encounters.poziom_trudnosci PT ON PT.id=P.id
+                        LEFT JOIN encounters.osoby T ON T.id=P.id_tworca
+                    WHERE T.nazwa = tworca
+                    ORDER BY 1 ASC ;
+            END IF;
     END;
     $$ LANGUAGE plpgsql;

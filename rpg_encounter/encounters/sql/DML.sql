@@ -50,22 +50,28 @@ INSERT INTO encounters.osoby(nazwa, login, haslo) VALUES
 
 INSERT INTO encounters.potyczki(nazwa, opis, id_lokacja, id_tworca) VALUES
     ('Potężny bój', 'Wielka bitka z potężnymi wrogami', 1, 2),
-    ('Podwodna przygoda', 'Walka na jeziorze a także pod nim', 3, 2);
+    ('Podwodna przygoda', 'Walka na jeziorze a także pod nim', 3, 2),
+    ('Mroczny chaos', 'Spowite mrokiem kopalnie kryją wielkie skarby', 2, 3);
 
 INSERT INTO encounters.pulapka_potyczka(id_potyczka, id_pulapka) VALUES
     (1, 2),
     (1, 1),
-    (2, 3);
+    (2, 3),
+    (3, 1);
 
 INSERT INTO encounters.skarb_potyczka(id_potyczka, id_skarb) VALUES
     (1, 1),
     (1, 2),
-    (2, 1);
+    (2, 1),
+    (3, 1),
+    (3, 2),
+    (3, 3);
 
 INSERT INTO encounters.potwor_potyczka(id_potyczka, id_potwor) VALUES
     (1, 3),
     (1, 2),
     (1, 1),
-    (2, 1);
+    (2, 1),
+    (3, 1);
 
 COMMIT;
