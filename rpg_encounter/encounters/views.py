@@ -193,3 +193,51 @@ class LogoutView(View):
         response.delete_cookie("auth")
         return response
 
+class DeleteFormView(FormView):
+
+    template_name = "delete_form.html"
+    success_url = "/"
+    message = ""
+    table_name = ""
+    id_name = ""
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["message"] = self.message
+        return context
+
+    def form_valid(self, form):
+        form.delete_record()
+        return super().form_valid(form)
+
+class DeleteTerrainView(DeleteFormView):
+    table_name = "tereny"
+    form_class = forms.create_delete_form(table_name)
+
+class DeleteLocationView(DeleteFormView):
+    table_name = "lokacje"
+    form_class = forms.create_delete_form(table_name)
+
+class DeleteTreasureView(DeleteFormView):
+    table_name = "skarby"
+    form_class = forms.create_delete_form(table_name)
+
+class DeleteTrapView(DeleteFormView):
+    table_name = "pulapki"
+    form_class = forms.create_delete_form(table_name)
+
+class DeleteRaceView(DeleteFormView):
+    table_name = "rasy"
+    form_class = forms.create_delete_form(table_name)
+
+class DeleteMonsterView(DeleteFormView):
+    table_name = "potwory"
+    form_class = forms.create_delete_form(table_name)
+
+class DeleteEncounterView(DeleteFormView):
+    form_class = forms.DeleteEncounterForm
+
+    def get_form_kwargs(self):
+        kw = super(DeleteEncounterView, self).get_form_kwargs()
+        kw['request'] = self.request
+        return kw

@@ -14,12 +14,13 @@ def execute_scripts_from_file(filename):
     try:
         cursor.execute(sql_file)
     except Exception as ex:
-        print("Command skipped: ", ex)
+        print("Couldn't create database")
+        print(ex)
 
 
 def get_id_name(table_name):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT id, nazwa FROM encounters." + table_name)
+        cursor.execute("SELECT id, nazwa FROM encounters." + table_name + " ORDER BY nazwa ASC;")
         return cursor.fetchall()
 
 
@@ -98,3 +99,21 @@ def get_encounter_by_creator(username):
         except IntegrityError as err:
             print(err)
             return None
+
+def delete_from_table(table_name, id_value):
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute("SELECT usun_"+table_name+" (CAST(%s AS BIGINT));", [id_value])
+            return True
+        except IntegrityError as err:
+            print(err)
+            return False
+
+def delete_encounter(id_record, username):
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute("SELECT usun_potyczke(CAST(%s AS BIGINT[]), %s)", [id_record, username])
+            print(f"Usunięto {id_record=}")
+        except IntegrityError as err:
+            print(err)
+            return False

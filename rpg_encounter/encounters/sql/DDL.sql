@@ -17,7 +17,7 @@ CREATE TABLE encounters.tereny(
 -- Potyczki
 CREATE TABLE encounters.potyczki(
     "id" SERIAL PRIMARY KEY,
-    "tytul" VARCHAR(100) UNIQUE NOT NULL,
+    "nazwa" VARCHAR(100) UNIQUE NOT NULL,
     "opis" VARCHAR(1000) NOT NULL,
     "id_lokacja" INTEGER NOT NULL,
     "id_tworca" INTEGER
@@ -167,7 +167,7 @@ CREATE OR REPLACE VIEW encounters.potyczki_skarby_widok AS
     
         
 CREATE OR REPLACE VIEW encounters.potyczki_widok AS
-    SELECT P.tytul, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom, T.nazwa AS "tworca"
+    SELECT P.nazwa, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom, T.nazwa AS "tworca"
         FROM encounters.potyczki P 
             LEFT JOIN encounters.lokacje L ON P.id_lokacja=L.id
             LEFT JOIN encounters.potyczki_potwory_widok Pot ON Pot.id=P.id
@@ -191,3 +191,91 @@ CREATE TRIGGER rzadkosc_skarbu_wyzwalacz
     BEFORE INSERT OR UPDATE ON encounters.skarby
     FOR EACH ROW 
     EXECUTE PROCEDURE rzadkosc_skarbu_funkcja();
+
+-- Funkcje
+
+CREATE OR REPLACE FUNCTION usun_potyczke(indexes BIGINT[], tworca VARCHAR)
+    RETURNS VOID AS
+    $$
+    DECLARE
+        index BIGINT;
+    BEGIN
+        FOREACH index IN ARRAY indexes LOOP
+            IF tworca = 'ADMIN' OR index IN
+                ( SELECT id FROM encounters.potyczki
+                          WHERE id_tworca = (SELECT id FROM encounters.osoby WHERE nazwa = tworca) )
+            THEN
+                DELETE FROM encounters.potwor_potyczka WHERE id_potyczka = index;
+                DELETE FROM encounters.skarb_potyczka WHERE id_potyczka = index;
+                DELETE FROM encounters.pulapka_potyczka WHERE id_potyczka = index;
+                DELETE FROM encounters.potyczki WHERE id = index;
+            END IF;
+        END LOOP;
+    END;
+    $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION usun_skarby(index BIGINT)
+    RETURNS VOID AS
+    $$
+    BEGIN
+        DELETE FROM encounters.skarb_potyczka WHERE id_skarb = $1;
+        DELETE FROM encounters.skarby WHERE id = $1;
+    END;
+    $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION usun_pulapki(index BIGINT)
+    RETURNS VOID AS
+    $$
+    BEGIN
+        DELETE FROM encounters.pulapka_potyczka WHERE id_pulapka = $1;
+        DELETE FROM encounters.pulapki WHERE id = $1;
+    END;
+    $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION usun_potwory(index BIGINT)
+    RETURNS VOID AS
+    $$
+    BEGIN
+        DELETE FROM encounters.potwor_potyczka WHERE id_potwor = $1;
+        DELETE FROM encounters.potwory WHERE id = $1;
+    END;
+    $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION usun_lokacje(index BIGINT)
+    RETURNS VOID AS
+    $$
+    BEGIN
+        PERFORM usun_potyczke(ARRAY[$1], 'ADMIN');
+        DELETE FROM encounters.lokacje WHERE id = $1;
+    END;
+    $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION usun_tereny(index BIGINT)
+    RETURNS VOID AS
+    $$
+    DECLARE
+        id_lokacja BIGINT;
+    BEGIN
+        FOR id_lokacja IN ( SELECT id FROM encounters.lokacje WHERE id_teren = $1 ) LOOP
+            PERFORM usun_lokacje(id_lokacja);
+        END LOOP;
+        DELETE FROM encounters.rasa_teren WHERE id_teren = $1;
+        DELETE FROM encounters.tereny WHERE id = $1;
+    END;
+    $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION usun_rasy(index BIGINT)
+    RETURNS VOID AS
+    $$
+    DECLARE
+        id_potwor BIGINT;
+    BEGIN
+        FOR id_potwor IN ( SELECT id FROM encounters.potwory WHERE id_rasa = $1 ) LOOP
+            PERFORM usun_potwory(id_potwor);
+        END LOOP;
+        DELETE FROM encounters.rasa_teren WHERE id_rasa = $1;
+        DELETE FROM encounters.rasy WHERE id = $1;
+    END;
+    $$ LANGUAGE plpgsql;

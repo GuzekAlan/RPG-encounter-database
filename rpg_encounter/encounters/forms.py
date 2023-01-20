@@ -7,6 +7,8 @@ from rpg_encounter.sql_utils import (
     get_max_index,
     check_user,
     get_user_id,
+    delete_from_table,
+    delete_encounter
 )
 
 
@@ -140,10 +142,10 @@ class EncounterForm(forms.Form):
     """Form for encounters.potyczki"""
 
     def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
+        self.request = kwargs.pop("request", None)
         super(EncounterForm, self).__init__(*args, **kwargs)
 
-    title = forms.CharField(max_length=100, label="Tytuł potyczki", required=True)
+    name = forms.CharField(max_length=100, label="Tytuł potyczki", required=True)
     description = forms.CharField(
         widget=forms.Textarea, max_length=1000, label="Krótki opis", required=True
     )
@@ -154,26 +156,26 @@ class EncounterForm(forms.Form):
         choices=get_id_name("potwory"),
         widget=forms.CheckboxSelectMultiple,
         label="Potwory",
-        required=True,
+        required=True
     )
     treasures = forms.MultipleChoiceField(
         choices=get_id_name("skarby"),
         widget=forms.CheckboxSelectMultiple,
         label="Skarby",
-        required=True,
+        required=True
     )
     traps = forms.MultipleChoiceField(
         choices=get_id_name("pulapki"),
         widget=forms.CheckboxSelectMultiple,
         label="Pułapki",
-        required=True,
+        required=True
     )
 
     def save_record(self):
         username = self.request.get_signed_cookie(key="auth", default=None)
         if not save_data(
             "potyczki",
-            tytul=self.cleaned_data["title"],
+            nazwa=self.cleaned_data["name"],
             opis=self.cleaned_data["description"],
             id_lokacja=self.cleaned_data["location"],
             id_tworca=get_user_id(username),
@@ -197,7 +199,6 @@ class EncounterForm(forms.Form):
                     ),
                 ]
             )
-        print("chuj")
         return 0
 
 
@@ -229,3 +230,30 @@ class UserLoginForm(forms.Form):
 
     def log_in(self):
         return check_user(self.cleaned_data["login"], self.cleaned_data["password"])
+
+def create_delete_form(table_name):
+    class DeleteItemForm(forms.Form):
+        id = forms.ChoiceField(
+            choices=get_id_name(table_name),
+            label="Wybierz element do usunięcia: ",
+            required=True,
+        )
+        def delete_record(self):
+            delete_from_table(table_name, self.cleaned_data["id"])
+    return DeleteItemForm
+
+class DeleteEncounterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)
+        super(DeleteEncounterForm, self).__init__(*args, **kwargs)
+
+    id = forms.ChoiceField(
+        choices=get_id_name("potyczki"),
+        label="Wybierz potyczkę do usunięcia",
+        required=True
+    )
+
+    def delete_record(self):
+        username = self.request.get_signed_cookie(key="auth", default=None)
+        delete_encounter(self.cleaned_data["id"], username)
+        return 0

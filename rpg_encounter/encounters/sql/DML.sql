@@ -42,23 +42,30 @@ INSERT INTO encounters.potwory(nazwa, opis, poziom_trudnosci, id_rasa) VALUES
     ('Wywerna', 'Mały nierozwinięty smok, który nie potrafi zionąć ogniem', 4, 3),
     ('Mała Syrenka', 'W sumie to nie potwór ale księżniczka ale nadal obrażenia zadawać może', 1, 2);
 
--- INSERT INTO encounters.uprawnienia(tabela, typ) VALUES
---     ('tereny', 'odczyt'),
---     ('tereny', 'zapis'),
---     ('rasy', 'odczyt'),
---     ('rasy', 'zapis'),
---     ('potwory', 'odczyt'),
---     ('potwory', 'zapis'),
---     ('lokacje', 'odczyt'),
---     ('lokacje', 'zapis'),
---     ('skarby', 'odczyt'),
---     ('skarby', 'zapis'),
---     ('pulapki', 'odczyt'),
---     ('pulapki', 'zapis');
 
 INSERT INTO encounters.osoby(nazwa, login, haslo) VALUES
     ('ADMIN', 'ADMIN', 'ADMIN'),
     ('Alan', 'alan', 'alan'),
     ('GMTomek', 'tomekthebest', 'qwerty');
+
+INSERT INTO encounters.potyczki(nazwa, opis, id_lokacja, id_tworca) VALUES
+    ('Potężny bój', 'Wielka bitka z potężnymi wrogami', 1, 2),
+    ('Podwodna przygoda', 'Walka na jeziorze a także pod nim', 3, 2);
+
+INSERT INTO encounters.pulapka_potyczka(id_potyczka, id_pulapka) VALUES
+    (1, 2),
+    (1, 1),
+    (2, 3);
+
+INSERT INTO encounters.skarb_potyczka(id_potyczka, id_skarb) VALUES
+    (1, 1),
+    (1, 2),
+    (2, 1);
+
+INSERT INTO encounters.potwor_potyczka(id_potyczka, id_potwor) VALUES
+    (1, 3),
+    (1, 2),
+    (1, 1),
+    (2, 1);
 
 COMMIT;
