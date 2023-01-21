@@ -223,12 +223,33 @@ CREATE OR REPLACE FUNCTION rzadkosc_skarbu_funkcja()
         NEW.rzadkosc := UPPER(NEW.rzadkosc);
         RETURN NEW;
     END;
-    $$ LANGUAGE 'plpgsql';
+    $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER rzadkosc_skarbu_wyzwalacz
     BEFORE INSERT OR UPDATE ON encounters.skarby
     FOR EACH ROW 
     EXECUTE PROCEDURE rzadkosc_skarbu_funkcja();
+
+CREATE OR REPLACE FUNCTION sprawdz_poziom_trudnosci()
+    RETURNS TRIGGER
+    AS $$
+    BEGIN
+        IF NEW.poziom_trudnosci > 10 OR NEW.poziom_trudnosci < 0 THEN
+           RAISE EXCEPTION 'Zły poziom trudnosci';
+        END IF;
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER poziom_trudnosci_potwory_wyzwalacz
+    BEFORE INSERT OR UPDATE ON encounters.potwory
+    FOR EACH ROW
+    EXECUTE PROCEDURE sprawdz_poziom_trudnosci();
+
+CREATE TRIGGER poziom_trudnosci_pulapki_wyzwalacz
+    BEFORE INSERT OR UPDATE ON encounters.pulapki
+    FOR EACH ROW
+    EXECUTE PROCEDURE sprawdz_poziom_trudnosci();
 
 -- Funkcje
 
@@ -236,43 +257,56 @@ CREATE OR REPLACE FUNCTION usun_potyczke(index BIGINT, tworca VARCHAR)
     RETURNS VOID AS
     $$
     BEGIN
-            IF tworca = 'ADMIN' OR index IN
-                ( SELECT id FROM encounters.potyczki
-                          WHERE id_tworca = (SELECT id FROM encounters.osoby WHERE nazwa = tworca) )
-            THEN
-                DELETE FROM encounters.potyczki WHERE id = index;
-            END IF;
+        IF tworca = 'ADMIN' OR index IN
+            ( SELECT id FROM encounters.potyczki
+                WHERE id_tworca = (SELECT id FROM encounters.osoby WHERE nazwa = tworca) )
+        THEN
+            DELETE FROM encounters.potyczki WHERE id = index;
+        END IF;
     END;
     $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION encounters.pokaz_potyczki(tworca VARCHAR)
-  RETURNS TABLE(nazwa VARCHAR, opis VARCHAR, lokacja VARCHAR, potwory TEXT, pulapki TEXT, skarby TEXT, pt BIGINT, t VARCHAR, id INTEGER) AS
+    RETURNS TABLE(nazwa VARCHAR, opis VARCHAR, lokacja VARCHAR, potwory TEXT, pulapki TEXT, skarby TEXT, pt BIGINT, t VARCHAR, id INTEGER) AS
     $$
     BEGIN
-            IF tworca = 'ADMIN'
-            THEN
-                RETURN QUERY
-                SELECT P.nazwa, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom, T.nazwa AS "tworca", P.id
-                    FROM encounters.potyczki P
-                        LEFT JOIN encounters.lokacje L ON P.id_lokacja=L.id
-                        LEFT JOIN encounters.potyczki_potwory_widok Pot ON Pot.id=P.id
-                        LEFT JOIN encounters.potyczki_pulapki_widok Pul ON Pul.id=P.id
-                        LEFT JOIN encounters.potyczki_skarby_widok S ON S.id=P.id
-                        LEFT JOIN encounters.poziom_trudnosci PT ON PT.id=P.id
-                        LEFT JOIN encounters.osoby T ON T.id=P.id_tworca
-                    ORDER BY 1 ASC ;
-            ELSE
-                RETURN QUERY
-                SELECT P.nazwa, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom, T.nazwa AS "tworca", P.id
-                    FROM encounters.potyczki P
-                        LEFT JOIN encounters.lokacje L ON P.id_lokacja=L.id
-                        LEFT JOIN encounters.potyczki_potwory_widok Pot ON Pot.id=P.id
-                        LEFT JOIN encounters.potyczki_pulapki_widok Pul ON Pul.id=P.id
-                        LEFT JOIN encounters.potyczki_skarby_widok S ON S.id=P.id
-                        LEFT JOIN encounters.poziom_trudnosci PT ON PT.id=P.id
-                        LEFT JOIN encounters.osoby T ON T.id=P.id_tworca
-                    WHERE T.nazwa = tworca
-                    ORDER BY 1 ASC ;
-            END IF;
+        IF tworca = 'ADMIN'
+        THEN
+            RETURN QUERY
+            SELECT P.nazwa, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom, T.nazwa AS "tworca", P.id
+                FROM encounters.potyczki P
+                    LEFT JOIN encounters.lokacje L ON P.id_lokacja=L.id
+                    LEFT JOIN encounters.potyczki_potwory_widok Pot ON Pot.id=P.id
+                    LEFT JOIN encounters.potyczki_pulapki_widok Pul ON Pul.id=P.id
+                    LEFT JOIN encounters.potyczki_skarby_widok S ON S.id=P.id
+                    LEFT JOIN encounters.poziom_trudnosci PT ON PT.id=P.id
+                    LEFT JOIN encounters.osoby T ON T.id=P.id_tworca
+                ORDER BY 1 ASC ;
+        ELSE
+            RETURN QUERY
+            SELECT P.nazwa, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom, T.nazwa AS "tworca", P.id
+                FROM encounters.potyczki P
+                    LEFT JOIN encounters.lokacje L ON P.id_lokacja=L.id
+                    LEFT JOIN encounters.potyczki_potwory_widok Pot ON Pot.id=P.id
+                    LEFT JOIN encounters.potyczki_pulapki_widok Pul ON Pul.id=P.id
+                    LEFT JOIN encounters.potyczki_skarby_widok S ON S.id=P.id
+                    LEFT JOIN encounters.poziom_trudnosci PT ON PT.id=P.id
+                    LEFT JOIN encounters.osoby T ON T.id=P.id_tworca
+                WHERE T.nazwa = tworca
+                ORDER BY 1 ASC ;
+        END IF;
+    END;
+    $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION encounters.filtruj_potyczki_po_poziomie_trudnosci(tworca VARCHAR, min_pt BIGINT, max_pt BIGINT)
+    RETURNS TABLE(nazwa VARCHAR, opis VARCHAR, lokacja VARCHAR, potwory TEXT, pulapki TEXT, skarby TEXT, pt BIGINT, t VARCHAR) AS
+    $$
+    BEGIN
+        RETURN QUERY
+        SELECT PP.nazwa, PP.opis, PP.lokacja, PP.potwory, PP.pulapki, PP.skarby, PP.pt, PP.t
+            FROM encounters.pokaz_potyczki(tworca) PP
+            WHERE PP.pt >= min_pt AND PP.pt <= max_pt
+            ORDER BY PP.pt DESC;
     END;
     $$ LANGUAGE plpgsql;

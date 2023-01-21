@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block content %}
+  <div>
+    <h2>POTYCZKI</h2>
+    <table>
+        <tr>
+        {% for name in column_names %}
+          <th>{{name}}</th>
+        {% endfor %}
+        </tr>
+        {% for row in select %}
+        <tr>
+            {% for cell in row %}
+            <td>{{cell}}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    <div>
+        <h4>Filtruj po poziomie trudności</h4>
+        <form action="{% url 'encounters:filter_encounter' %}" method="GET">
+            <div class="form-row">
+                <label for="min_lvl">Minimalny poziom trudności</label>
+                <input type="number" name="min_lvl" id="min_lvl" min="0" required>
+            </div>
+            <div class="form-row">
+                <label for="max_lvl">Maksymalny poziom trudności</label>
+                <input type="number" name="max_lvl" id="max_lvl" min="0" required>
+            </div>
+            <div>
+                <input type="submit" value="Filtruj">
+            </div>
+        </form>
+    </div>
+    <div>
+      <a href="/">Strona główna</a>
+    </div>
+  </div>
+{% endblock %}

@@ -7,7 +7,7 @@ from django.views.decorators.cache import never_cache
 from rpg_encounter.sql_utils import (
     execute_scripts_from_file,
     get_data,
-    get_encounter_by_creator,
+    get_encounter_by_creator, get_encounter_by_creator_filter,
 )
 from os import path
 
@@ -34,7 +34,6 @@ class CreateDatabaseView(TemplateView):
 
 
 # Table views
-
 
 
 class SimpleTableView(TemplateView):
@@ -91,7 +90,7 @@ class TrapTableView(SimpleTableView):
 class EncounterTableView(TemplateView):
     template_name = "encounters_table.html"
     tableColumns = [
-        "Tytuł Potyczki",
+        "Nazwa Potyczki",
         "Krótki opis",
         "Lokacja",
         "Potwory",
@@ -201,6 +200,8 @@ class LogoutView(View):
         return response
 
 
+# Delete vies
+
 class DeleteFormView(FormView):
 
     template_name = "delete_form.html"
@@ -257,3 +258,34 @@ class DeleteEncounterView(DeleteFormView):
         kw = super(DeleteEncounterView, self).get_form_kwargs()
         kw["request"] = self.request
         return kw
+
+
+# Other views
+
+class EncounterFilteredView(TemplateView):
+    template_name = "encounters_filtered_table.html"
+
+    tableColumns = [
+        "Nazwa Potyczki",
+        "Krótki opis",
+        "Lokacja",
+        "Potwory",
+        "Pułapki",
+        "Skarby",
+        "Poziom Trudności",
+        "Nazwa twórcy",
+    ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["column_names"] = self.tableColumns
+        # context["min_lvl"] = 0
+        # context["max_lvl"] = 100
+        context["min_lvl"] = self.request.GET.get('min_lvl', default=0)
+        context["max_lvl"] = self.request.GET.get('max_lvl', default=100)
+        context["select"] = get_encounter_by_creator_filter(
+            self.request.get_signed_cookie("auth", default=None),
+            context["min_lvl"],
+            context["max_lvl"]
+        )
+        return context

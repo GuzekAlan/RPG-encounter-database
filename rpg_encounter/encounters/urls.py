@@ -32,4 +32,5 @@ urlpatterns = [
     path(
         "delete_encounter", views.DeleteEncounterView.as_view(), name="delete_encounter"
     ),
+    path("filter_encounter", views.EncounterFilteredView.as_view(), name="filter_encounter"),
 ]

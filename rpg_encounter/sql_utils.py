@@ -121,3 +121,15 @@ def delete_encounter(id_record, username):
         except IntegrityError as err:
             print(err)
             return False
+
+def get_encounter_by_creator_filter(username, min_lvl, max_lvl):
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute("SELECT * FROM encounters.filtruj_potyczki_po_poziomie_trudnosci(%s, CAST(%s AS BIGINT), CAST(%s AS BIGINT))", [username, min_lvl, max_lvl])
+            data = cursor.fetchall()
+            if data:
+                return data
+            return None
+        except IntegrityError as err:
+            print(err)
+            return None
