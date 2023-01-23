@@ -17,7 +17,7 @@ CREATE TABLE encounters.tereny(
 -- Potyczki
 CREATE TABLE encounters.potyczki(
     "id" SERIAL PRIMARY KEY,
-    "tytul" VARCHAR(100) UNIQUE NOT NULL,
+    "nazwa" VARCHAR(100) UNIQUE NOT NULL,
     "opis" VARCHAR(1000) NOT NULL,
     "id_lokacja" INTEGER NOT NULL,
     "id_tworca" INTEGER
@@ -79,25 +79,73 @@ CREATE TABLE encounters.potwor_potyczka(
 );
 
 -- Klucze obce
-ALTER TABLE encounters.potwory 
-    ADD CONSTRAINT "potwory_id_rasa_foreign" FOREIGN KEY("id_rasa") REFERENCES encounters.rasy("id");
+ALTER TABLE encounters.potwory
+    ADD CONSTRAINT "potwory_id_rasa_foreign"
+        FOREIGN KEY("id_rasa")
+        REFERENCES encounters.rasy("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE;
 ALTER TABLE encounters.potyczki 
-    ADD CONSTRAINT "potyczki_id_lokacja_foreign" FOREIGN KEY("id_lokacja") REFERENCES encounters.lokacje("id"),
-    ADD CONSTRAINT "potyczki_id_tworca_foreign" FOREIGN KEY("id_tworca") REFERENCES encounters.osoby("id");
+    ADD CONSTRAINT "potyczki_id_lokacja_foreign"
+        FOREIGN KEY("id_lokacja")
+        REFERENCES encounters.lokacje("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE,
+    ADD CONSTRAINT "potyczki_id_tworca_foreign"
+        FOREIGN KEY("id_tworca")
+        REFERENCES encounters.osoby("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE;
 ALTER TABLE encounters.lokacje 
-    ADD CONSTRAINT "lokacje_id_teren_foreign" FOREIGN KEY("id_teren") REFERENCES encounters.tereny("id");
+    ADD CONSTRAINT "lokacje_id_teren_foreign"
+        FOREIGN KEY("id_teren")
+        REFERENCES encounters.tereny("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE;
 ALTER TABLE encounters.potwor_potyczka 
-    ADD CONSTRAINT "potwor_potyczka_id_potyczka_foreign" FOREIGN KEY("id_potyczka") REFERENCES encounters.potyczki("id"),
-    ADD CONSTRAINT "potwor_potyczka_id_potwor_foreign" FOREIGN KEY("id_potwor") REFERENCES encounters.potwory("id");
+    ADD CONSTRAINT "potwor_potyczka_id_potyczka_foreign"
+        FOREIGN KEY("id_potyczka")
+        REFERENCES encounters.potyczki("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE,
+    ADD CONSTRAINT "potwor_potyczka_id_potwor_foreign"
+        FOREIGN KEY("id_potwor")
+        REFERENCES encounters.potwory("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE;
 ALTER TABLE encounters.skarb_potyczka 
-    ADD CONSTRAINT "skarb_potyczka_id_potyczka_foreign" FOREIGN KEY("id_potyczka") REFERENCES encounters.potyczki("id"),
-    ADD CONSTRAINT "skarb_potyczka_id_skarb_foreign" FOREIGN KEY("id_skarb") REFERENCES encounters.skarby("id");
+    ADD CONSTRAINT "skarb_potyczka_id_potyczka_foreign"
+        FOREIGN KEY("id_potyczka")
+        REFERENCES encounters.potyczki("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE,
+    ADD CONSTRAINT "skarb_potyczka_id_skarb_foreign"
+        FOREIGN KEY("id_skarb")
+        REFERENCES encounters.skarby("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE;
 ALTER TABLE encounters.pulapka_potyczka 
-    ADD CONSTRAINT "pulapka_potyczka_id_potyczka_foreign" FOREIGN KEY("id_potyczka") REFERENCES encounters.potyczki("id"),
-    ADD CONSTRAINT "pulapka_potyczka_id_pulapka_foreign" FOREIGN KEY("id_pulapka") REFERENCES encounters.pulapki("id");
+    ADD CONSTRAINT "pulapka_potyczka_id_potyczka_foreign"
+        FOREIGN KEY("id_potyczka")
+        REFERENCES encounters.potyczki("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE,
+    ADD CONSTRAINT "pulapka_potyczka_id_pulapka_foreign"
+        FOREIGN KEY("id_pulapka")
+        REFERENCES encounters.pulapki("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE;
 ALTER TABLE encounters.rasa_teren
-    ADD CONSTRAINT "rasa_teren_id_rasa_foreign" FOREIGN KEY("id_rasa") REFERENCES encounters.rasy("id"),
-    ADD CONSTRAINT "rasa_teren_id_teren_foreign" FOREIGN KEY("id_teren") REFERENCES encounters.tereny("id");
+    ADD CONSTRAINT "rasa_teren_id_rasa_foreign"
+        FOREIGN KEY("id_rasa")
+        REFERENCES encounters.rasy("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE,
+    ADD CONSTRAINT "rasa_teren_id_teren_foreign"
+        FOREIGN KEY("id_teren")
+        REFERENCES encounters.tereny("id")
+        ON DELETE CASCADE
+        NOT DEFERRABLE;
 
 -- widoki
 CREATE OR REPLACE VIEW encounters.tereny_widok AS
@@ -118,7 +166,7 @@ CREATE OR REPLACE VIEW encounters.lokacje_widok AS
 CREATE OR REPLACE VIEW encounters.rasy_widok AS
     SELECT R.nazwa, R.opis, STRING_AGG(T.nazwa, ',') as "tereny"
         FROM encounters.rasy R LEFT JOIN encounters.rasa_teren RT ON RT.id_rasa=R.id
-        JOIN encounters.tereny T ON RT.id_teren=T.id
+        LEFT JOIN encounters.tereny T ON RT.id_teren=T.id
         GROUP BY R.id
         ORDER BY 1 ASC;
 
@@ -126,7 +174,7 @@ CREATE OR REPLACE VIEW encounters.potwory_widok AS
     SELECT P.nazwa, P.opis, P.poziom_trudnosci, R.nazwa AS "rasa", STRING_AGG(T.nazwa, ',') as "tereny"
         FROM encounters.potwory P JOIN encounters.rasy R ON P.id_rasa=R.id
         LEFT JOIN encounters.rasa_teren RT ON RT.id_rasa=R.id
-        JOIN encounters.tereny T ON RT.id_teren=T.id
+        LEFT JOIN encounters.tereny T ON RT.id_teren=T.id
         GROUP BY P.id, R.id
         ORDER BY 3 DESC, 1 ASC;
 
@@ -164,18 +212,8 @@ CREATE OR REPLACE VIEW encounters.potyczki_skarby_widok AS
             LEFT JOIN encounters.skarb_potyczka SP ON SP.id_potyczka=P.id
             JOIN encounters.skarby S ON S.id=SP.id_skarb
         GROUP BY P.id;
-    
-        
-CREATE OR REPLACE VIEW encounters.potyczki_widok AS
-    SELECT P.tytul, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom, T.nazwa AS "tworca"
-        FROM encounters.potyczki P 
-            LEFT JOIN encounters.lokacje L ON P.id_lokacja=L.id
-            LEFT JOIN encounters.potyczki_potwory_widok Pot ON Pot.id=P.id
-            LEFT JOIN encounters.potyczki_pulapki_widok Pul ON Pul.id=P.id
-            LEFT JOIN encounters.potyczki_skarby_widok S ON S.id=P.id           
-            LEFT JOIN encounters.poziom_trudnosci PT ON PT.id=P.id
-            LEFT JOIN encounters.osoby T ON T.id=P.id_tworca
-        ORDER BY 1 ASC;
+
+
 
 -- Wyzwalacze
 CREATE OR REPLACE FUNCTION rzadkosc_skarbu_funkcja()
@@ -185,9 +223,90 @@ CREATE OR REPLACE FUNCTION rzadkosc_skarbu_funkcja()
         NEW.rzadkosc := UPPER(NEW.rzadkosc);
         RETURN NEW;
     END;
-    $$ LANGUAGE 'plpgsql';
+    $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER rzadkosc_skarbu_wyzwalacz
     BEFORE INSERT OR UPDATE ON encounters.skarby
     FOR EACH ROW 
     EXECUTE PROCEDURE rzadkosc_skarbu_funkcja();
+
+CREATE OR REPLACE FUNCTION sprawdz_poziom_trudnosci()
+    RETURNS TRIGGER
+    AS $$
+    BEGIN
+        IF NEW.poziom_trudnosci > 10 OR NEW.poziom_trudnosci < 0 THEN
+           RAISE EXCEPTION 'Zły poziom trudnosci';
+        END IF;
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER poziom_trudnosci_potwory_wyzwalacz
+    BEFORE INSERT OR UPDATE ON encounters.potwory
+    FOR EACH ROW
+    EXECUTE PROCEDURE sprawdz_poziom_trudnosci();
+
+CREATE TRIGGER poziom_trudnosci_pulapki_wyzwalacz
+    BEFORE INSERT OR UPDATE ON encounters.pulapki
+    FOR EACH ROW
+    EXECUTE PROCEDURE sprawdz_poziom_trudnosci();
+
+-- Funkcje
+
+CREATE OR REPLACE FUNCTION usun_potyczke(index BIGINT, tworca VARCHAR)
+    RETURNS VOID AS
+    $$
+    BEGIN
+        IF tworca = 'ADMIN' OR index IN
+            ( SELECT id FROM encounters.potyczki
+                WHERE id_tworca = (SELECT id FROM encounters.osoby WHERE nazwa = tworca) )
+        THEN
+            DELETE FROM encounters.potyczki WHERE id = index;
+        END IF;
+    END;
+    $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION encounters.pokaz_potyczki(tworca VARCHAR)
+    RETURNS TABLE(nazwa VARCHAR, opis VARCHAR, lokacja VARCHAR, potwory TEXT, pulapki TEXT, skarby TEXT, pt BIGINT, t VARCHAR, id INTEGER) AS
+    $$
+    BEGIN
+        IF tworca = 'ADMIN'
+        THEN
+            RETURN QUERY
+            SELECT P.nazwa, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom, T.nazwa AS "tworca", P.id
+                FROM encounters.potyczki P
+                    LEFT JOIN encounters.lokacje L ON P.id_lokacja=L.id
+                    LEFT JOIN encounters.potyczki_potwory_widok Pot ON Pot.id=P.id
+                    LEFT JOIN encounters.potyczki_pulapki_widok Pul ON Pul.id=P.id
+                    LEFT JOIN encounters.potyczki_skarby_widok S ON S.id=P.id
+                    LEFT JOIN encounters.poziom_trudnosci PT ON PT.id=P.id
+                    LEFT JOIN encounters.osoby T ON T.id=P.id_tworca
+                ORDER BY 1 ASC ;
+        ELSE
+            RETURN QUERY
+            SELECT P.nazwa, P.opis, L.nazwa AS "lokacja", Pot.potwory, Pul.pulapki, S.skarby, PT.poziom, T.nazwa AS "tworca", P.id
+                FROM encounters.potyczki P
+                    LEFT JOIN encounters.lokacje L ON P.id_lokacja=L.id
+                    LEFT JOIN encounters.potyczki_potwory_widok Pot ON Pot.id=P.id
+                    LEFT JOIN encounters.potyczki_pulapki_widok Pul ON Pul.id=P.id
+                    LEFT JOIN encounters.potyczki_skarby_widok S ON S.id=P.id
+                    LEFT JOIN encounters.poziom_trudnosci PT ON PT.id=P.id
+                    LEFT JOIN encounters.osoby T ON T.id=P.id_tworca
+                WHERE T.nazwa = tworca
+                ORDER BY 1 ASC ;
+        END IF;
+    END;
+    $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION encounters.filtruj_potyczki_po_poziomie_trudnosci(tworca VARCHAR, min_pt BIGINT, max_pt BIGINT)
+    RETURNS TABLE(nazwa VARCHAR, opis VARCHAR, lokacja VARCHAR, potwory TEXT, pulapki TEXT, skarby TEXT, pt BIGINT, t VARCHAR) AS
+    $$
+    BEGIN
+        RETURN QUERY
+        SELECT PP.nazwa, PP.opis, PP.lokacja, PP.potwory, PP.pulapki, PP.skarby, PP.pt, PP.t
+            FROM encounters.pokaz_potyczki(tworca) PP
+            WHERE PP.pt >= min_pt AND PP.pt <= max_pt
+            ORDER BY PP.pt DESC;
+    END;
+    $$ LANGUAGE plpgsql;

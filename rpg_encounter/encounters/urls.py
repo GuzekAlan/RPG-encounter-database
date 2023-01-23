@@ -23,4 +23,14 @@ urlpatterns = [
     path("register", views.UserRegisterFormView.as_view(), name="register"),
     path("login", views.UserLoginFormView.as_view(), name="login"),
     path("logout", views.LogoutView.as_view(), name="logout"),
+    path("delete_terrain", views.DeleteTerrainView.as_view(), name="delete_terrain"),
+    path("delete_location", views.DeleteLocationView.as_view(), name="delete_location"),
+    path("delete_treasure", views.DeleteTreasureView.as_view(), name="delete_treasure"),
+    path("delete_trap", views.DeleteTrapView.as_view(), name="delete_trap"),
+    path("delete_race", views.DeleteRaceView.as_view(), name="delete_race"),
+    path("delete_monster", views.DeleteMonsterView.as_view(), name="delete_monster"),
+    path(
+        "delete_encounter", views.DeleteEncounterView.as_view(), name="delete_encounter"
+    ),
+    path("filter_encounter", views.EncounterFilteredView.as_view(), name="filter_encounter"),
 ]

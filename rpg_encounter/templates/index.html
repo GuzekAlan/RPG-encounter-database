@@ -2,12 +2,9 @@
 
 {% block content %}
     {% if username %}
-    <h1>Hello {{ username }}</h1>
+    <h1>Witaj {{ username }}</h1>
     {% endif %}
     <div>
-    <form action="{% url 'encounters:create_database' %}">
-            <input type="submit" value="Stwórz Bazę Danych" />
-        </form>
         {% if username %}
             <form action="{% url 'encounters:logout' %}">
             <input type="submit" value="Wyloguj się" />
@@ -42,6 +39,26 @@
                 <input type="submit" value="Dodaj Potwora" />
             </form>
             ----------------------------------------------
+            <h3>Usuń elementy potyczki</h3>
+            <form action="{% url 'encounters:delete_terrain' %}">
+                <input type="submit" value="Usuń Teren" />
+            </form>
+            <form action="{% url 'encounters:delete_location' %}">
+                <input type="submit" value="Usuń Lokację" />
+            </form>
+            <form action="{% url 'encounters:delete_treasure' %}">
+                <input type="submit" value="Usuń Skarb" />
+            </form>
+            <form action="{% url 'encounters:delete_trap' %}">
+                <input type="submit" value="Usuń Pułapkę" />
+            </form>
+            <form action="{% url 'encounters:delete_race' %}">
+                <input type="submit" value="Usuń Rasę" />
+            </form>
+            <form action="{% url 'encounters:delete_monster' %}">
+                <input type="submit" value="Usuń Potwora" />
+            </form>
+            ----------------------------------------------
         {% endif %}
         <h3>Zobacz elementy potyczki</h3>
         <form action="{% url 'encounters:terrain_table' %}">
@@ -68,13 +85,18 @@
             <input type="submit" value="Pokaż Potwory" />
         </form>
 
+    {% if username %}
         ----------------------------------------------
         <h3>Zarządzaj swoimi potyczkami</h3>
         <form action="{% url 'encounters:encounter_form' %}">
             <input type="submit" value="Dodaj Potyczkę" />
         </form>
-        <form action="{% url 'encounters:encounter_table' %}">
+        <form action="{% url 'encounters:filter_encounter' %}">
             <input type="submit" value="Pokaż Potyczki" />
         </form>
+        <form action="{% url 'encounters:delete_encounter' %}">
+            <input type="submit" value="Usuń Potyczkę" />
+        </form>
+    {% endif %}
     </div>
 {% endblock %}

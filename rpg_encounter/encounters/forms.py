@@ -7,6 +7,9 @@ from rpg_encounter.sql_utils import (
     get_max_index,
     check_user,
     get_user_id,
+    delete_from_table,
+    delete_encounter,
+    get_id_name_encounter,
 )
 
 
@@ -29,12 +32,16 @@ class TerrainForm(forms.Form):
 class LocationForm(forms.Form):
     """Form for encounters.lokacje"""
 
+    def __init__(self, *args, **kwargs):
+        super(LocationForm, self).__init__(*args, **kwargs)
+        self.fields["terrain"].choices=get_id_name("tereny")
+
     name = forms.CharField(max_length=100, label="Nazwa lokacji", required=True)
     description = forms.CharField(
         widget=forms.Textarea, max_length=1000, label="Krótki opis", required=True
     )
     terrain = forms.ChoiceField(
-        choices=get_id_name("tereny"), label="Teren", required=True
+        label="Teren", required=True
     )
 
     def save_record(self):
@@ -71,12 +78,15 @@ class TreasureForm(forms.Form):
 class RaceForm(forms.Form):
     """Form for encounters.rasy"""
 
+    def __init__(self, *args, **kwargs):
+        super(RaceForm, self).__init__(*args, **kwargs)
+        self.fields["terrains"].choices=get_id_name("tereny")
+
     name = forms.CharField(max_length=100, label="Nazwa rasy", required=True)
     description = forms.CharField(
         widget=forms.Textarea, max_length=1000, label="Krótki opis", required=True
     )
     terrains = forms.MultipleChoiceField(
-        choices=get_id_name("tereny"),
         widget=forms.CheckboxSelectMultiple,
         label="Zamieszkiwane tereny",
         required=True,
@@ -97,6 +107,10 @@ class RaceForm(forms.Form):
 class MonsterForm(forms.Form):
     """Form for encounters.potwory"""
 
+    def __init__(self, *args, **kwargs):
+        super(MonsterForm, self).__init__(*args, **kwargs)
+        self.fields["race"].choices = get_id_name("rasy")
+
     name = forms.CharField(max_length=100, label="Nazwa potwora", required=True)
     description = forms.CharField(
         widget=forms.Textarea, max_length=1000, label="Krótki opis", required=True
@@ -104,7 +118,7 @@ class MonsterForm(forms.Form):
     lvl = forms.IntegerField(
         max_value=10, min_value=0, label="Poziom trudności", required=True
     )
-    race = forms.ChoiceField(choices=get_id_name("rasy"), label="Rasa", required=True)
+    race = forms.ChoiceField(label="Rasa", required=True)
 
     def save_record(self):
         return save_data(
@@ -140,40 +154,33 @@ class EncounterForm(forms.Form):
     """Form for encounters.potyczki"""
 
     def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
+        self.request = kwargs.pop("request", None)
         super(EncounterForm, self).__init__(*args, **kwargs)
+        self.fields["monsters"].choices = get_id_name("potwory")
+        self.fields["treasures"].choices = get_id_name("skarby")
+        self.fields["traps"].choices = get_id_name("pulapki")
+        self.fields["location"].choices = get_id_name("lokacje")
 
-    title = forms.CharField(max_length=100, label="Tytuł potyczki", required=True)
+    name = forms.CharField(max_length=100, label="Tytuł potyczki", required=True)
     description = forms.CharField(
         widget=forms.Textarea, max_length=1000, label="Krótki opis", required=True
     )
-    location = forms.ChoiceField(
-        choices=get_id_name("lokacje"), label="Lokacja", required=True
-    )
+    location = forms.ChoiceField(label="Lokacja", required=True)
     monsters = forms.MultipleChoiceField(
-        choices=get_id_name("potwory"),
-        widget=forms.CheckboxSelectMultiple,
-        label="Potwory",
-        required=True,
+        widget=forms.CheckboxSelectMultiple, label="Potwory", required=True
     )
     treasures = forms.MultipleChoiceField(
-        choices=get_id_name("skarby"),
-        widget=forms.CheckboxSelectMultiple,
-        label="Skarby",
-        required=True,
+        widget=forms.CheckboxSelectMultiple, label="Skarby", required=True
     )
     traps = forms.MultipleChoiceField(
-        choices=get_id_name("pulapki"),
-        widget=forms.CheckboxSelectMultiple,
-        label="Pułapki",
-        required=True,
+        widget=forms.CheckboxSelectMultiple, label="Pułapki", required=True
     )
 
     def save_record(self):
         username = self.request.get_signed_cookie(key="auth", default=None)
         if not save_data(
             "potyczki",
-            tytul=self.cleaned_data["title"],
+            nazwa=self.cleaned_data["name"],
             opis=self.cleaned_data["description"],
             id_lokacja=self.cleaned_data["location"],
             id_tworca=get_user_id(username),
@@ -197,7 +204,6 @@ class EncounterForm(forms.Form):
                     ),
                 ]
             )
-        print("chuj")
         return 0
 
 
@@ -229,3 +235,35 @@ class UserLoginForm(forms.Form):
 
     def log_in(self):
         return check_user(self.cleaned_data["login"], self.cleaned_data["password"])
+
+
+def create_delete_form(table_name):
+    class DeleteItemForm(forms.Form):
+        def __init__(self, *args, **kwargs):
+            super(DeleteItemForm, self).__init__(*args, **kwargs)
+            self.fields["id"].choices = get_id_name(table_name)
+
+        id = forms.ChoiceField(
+            label="Wybierz element do usunięcia: ",
+            required=True,
+        )
+
+        def delete_record(self):
+            delete_from_table(table_name, self.cleaned_data["id"])
+
+    return DeleteItemForm
+
+
+class DeleteEncounterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)
+        self.username = self.request.get_signed_cookie(key="auth", default=None)
+        super(DeleteEncounterForm, self).__init__(*args, **kwargs)
+        self.fields["id"].choices = get_id_name_encounter(self.username)
+
+    id = forms.ChoiceField(label="Wybierz potyczkę do usunięcia", required=True)
+
+    def delete_record(self):
+        print(get_id_name("potyczki"))
+        delete_encounter(self.cleaned_data["id"], self.username)
+        return 0
