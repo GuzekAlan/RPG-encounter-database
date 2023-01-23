@@ -1,5 +1,5 @@
 # RPG-encounter-database
-### A simple database application to save encounters for RPG games
+### A simple database application to save encounters for RPG games (project for colleague classes)
 
 ## Overview
 
