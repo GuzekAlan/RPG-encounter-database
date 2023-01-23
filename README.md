@@ -5,7 +5,7 @@
 
 It allows to store encounters, show them and delete them. ADMIN has rights to modify more than a user.
 
-![Preview](./docs/preview.png)
+![Preview](img/preview.png)
 
 ## Instalation
 
