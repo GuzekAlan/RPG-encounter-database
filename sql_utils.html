@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module sql_utils</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>sql_utils</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/alan/dev/RPG-encounter-database/rpg_encounter/sql_utils.py">/home/alan/dev/RPG-encounter-database/rpg_encounter/sql_utils.py</a></font></td></tr></table>
+    <p><tt>Funkcje&nbsp;do&nbsp;komunikowania&nbsp;się&nbsp;z&nbsp;bazą&nbsp;danych</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-check_user"><strong>check_user</strong></a>(login, password)</dt><dd><tt>Funkcja&nbsp;porównuje&nbsp;hasło&nbsp;z&nbsp;bazy&nbsp;danych&nbsp;z&nbsp;podanym&nbsp;na&nbsp;podstawie&nbsp;loginu<br>
+:login:&nbsp;login&nbsp;użytkownika,&nbsp;którego&nbsp;hasło&nbsp;należy&nbsp;zwrócić&nbsp;z&nbsp;bazy&nbsp;danych<br>
+:password:&nbsp;hasło&nbsp;do&nbsp;porównania<br>
+Zwraca&nbsp;nazwę&nbsp;użytkownika&nbsp;lub&nbsp;None</tt></dd></dl>
+ <dl><dt><a name="-connect_many_to_many"><strong>connect_many_to_many</strong></a>(table_name, ids_left, ids_right)</dt><dd><tt>Funkcja&nbsp;dodaje&nbsp;do&nbsp;tablicy&nbsp;asocjacyjnej&nbsp;wszystkie&nbsp;kombinacje&nbsp;rekordów<br>
+:table_name:&nbsp;nazwa&nbsp;tablicy&nbsp;asocjacyjnej<br>
+:ids_left:&nbsp;lista&nbsp;id&nbsp;lewej&nbsp;tablicy<br>
+:ids_right:&nbsp;lista&nbsp;id&nbsp;prawej&nbsp;tablicy</tt></dd></dl>
+ <dl><dt><a name="-delete_encounter"><strong>delete_encounter</strong></a>(id_record, username)</dt><dd><tt>Funkcja&nbsp;usuwa&nbsp;potyczkę&nbsp;o&nbsp;podanym&nbsp;rekordzie,&nbsp;jeśli&nbsp;należy&nbsp;ona&nbsp;do&nbsp;użytkownika<br>
+:id_record:&nbsp;numer&nbsp;id&nbsp;potyczki<br>
+:username:&nbsp;nazwa&nbsp;użytkownika<br>
+Zwraca&nbsp;True&nbsp;jeśli&nbsp;się&nbsp;udało&nbsp;usunąć&nbsp;lub&nbsp;False&nbsp;jeśli&nbsp;się&nbsp;nie&nbsp;udało</tt></dd></dl>
+ <dl><dt><a name="-delete_from_table"><strong>delete_from_table</strong></a>(table_name, id_value)</dt><dd><tt>Funkcja&nbsp;usuwa&nbsp;rekord&nbsp;o&nbsp;podanym&nbsp;id&nbsp;z&nbsp;tabeli<br>
+:table_name:&nbsp;nazwa&nbsp;tabeli<br>
+:id_value:&nbsp;id&nbsp;rekordu<br>
+Zwraca&nbsp;True&nbsp;jeśli&nbsp;się&nbsp;udało&nbsp;usunąć&nbsp;lub&nbsp;False&nbsp;jeśli&nbsp;się&nbsp;nie&nbsp;udało</tt></dd></dl>
+ <dl><dt><a name="-execute_scripts_from_file"><strong>execute_scripts_from_file</strong></a>(filename)</dt><dd><tt>Funkcja&nbsp;do&nbsp;wykonania&nbsp;skryptu&nbsp;SQL&nbsp;z&nbsp;pliku<br>
+:filename:&nbsp;ścieżka&nbsp;do&nbsp;pliku,&nbsp;z&nbsp;którego&nbsp;należy&nbsp;wziąć&nbsp;skrypt</tt></dd></dl>
+ <dl><dt><a name="-get_data"><strong>get_data</strong></a>(table_name, columns='*')</dt><dd><tt>Funkcja&nbsp;zwraca&nbsp;wszystkie&nbsp;rekordy&nbsp;z&nbsp;określonych&nbsp;kolumn&nbsp;z&nbsp;podanej&nbsp;tablicy<br>
+:table_name:&nbsp;nazwa&nbsp;tablicy&nbsp;z&nbsp;której&nbsp;pobierane&nbsp;są&nbsp;dane<br>
+:columns:&nbsp;lista&nbsp;column,&nbsp;z&nbsp;których&nbsp;pobierane&nbsp;są&nbsp;dane&nbsp;(zapisana&nbsp;jako&nbsp;string)</tt></dd></dl>
+ <dl><dt><a name="-get_encounter_by_creator"><strong>get_encounter_by_creator</strong></a>(username)</dt><dd><tt>Funkcja&nbsp;zwraca&nbsp;potyczki&nbsp;danego&nbsp;użytkownika&nbsp;(jeśli&nbsp;ADMIN&nbsp;to&nbsp;wszystkie)<br>
+:username:&nbsp;nazwa&nbsp;użytkownika<br>
+Jeśli&nbsp;nie&nbsp;ma&nbsp;takiego&nbsp;użytkownika&nbsp;to&nbsp;zwraca&nbsp;None</tt></dd></dl>
+ <dl><dt><a name="-get_encounter_by_creator_filter"><strong>get_encounter_by_creator_filter</strong></a>(username, min_lvl, max_lvl)</dt><dd><tt>Funkcja&nbsp;zwraca&nbsp;listę&nbsp;potyczek&nbsp;danego&nbsp;użytkownika,&nbsp;których&nbsp;poziom&nbsp;trudności&nbsp;mieści&nbsp;się&nbsp;w&nbsp;zadanym&nbsp;rozmiarze<br>
+:username:&nbsp;nazwa&nbsp;użytkownika<br>
+:min_lvl:&nbsp;minimalny&nbsp;poziom&nbsp;trudności<br>
+:max_lvl:&nbsp;maksymalny&nbsp;poziom&nbsp;trudności</tt></dd></dl>
+ <dl><dt><a name="-get_id_name"><strong>get_id_name</strong></a>(table_name)</dt><dd><tt>Funkcja&nbsp;zwraca&nbsp;id&nbsp;oraz&nbsp;nazwę&nbsp;z&nbsp;podanej&nbsp;tabeli<br>
+:table_name:&nbsp;nazwa&nbsp;tabeli&nbsp;(bez&nbsp;przedrostka&nbsp;SCHEMA)</tt></dd></dl>
+ <dl><dt><a name="-get_id_name_encounter"><strong>get_id_name_encounter</strong></a>(name)</dt><dd><tt>Funkcja&nbsp;zwraca&nbsp;id&nbsp;oraz&nbsp;nazwę&nbsp;z&nbsp;tabeli&nbsp;`potyczki`&nbsp;użytkownika&nbsp;o&nbsp;podanej&nbsp;nazwie<br>
+:name:&nbsp;nazwa&nbsp;użytkownika,&nbsp;którego&nbsp;potyczki&nbsp;należy&nbsp;zwróci,&nbsp;w&nbsp;przypadku&nbsp;nazwy&nbsp;ADMIN&nbsp;zwróci&nbsp;wszystkie</tt></dd></dl>
+ <dl><dt><a name="-get_max_index"><strong>get_max_index</strong></a>(table_name)</dt><dd><tt>Funkcja&nbsp;zwraca&nbsp;maksymalny&nbsp;indeks&nbsp;z&nbsp;podanej&nbsp;tablicy<br>
+:table_name:&nbsp;nazwa&nbsp;tablicy</tt></dd></dl>
+ <dl><dt><a name="-get_user_id"><strong>get_user_id</strong></a>(username)</dt><dd><tt>Funkcja&nbsp;zwraca&nbsp;id&nbsp;użutkownika&nbsp;o&nbsp;podanej&nbsp;nazwie&nbsp;lub&nbsp;None<br>
+:username:&nbsp;nazwa&nbsp;użytkownika</tt></dd></dl>
+ <dl><dt><a name="-save_data"><strong>save_data</strong></a>(table_name, **kwargs)</dt><dd><tt>Funkcja&nbsp;zapisuje&nbsp;w&nbsp;podanej&nbsp;tablicy&nbsp;rekord&nbsp;o&nbsp;podanych&nbsp;atrybutach.<br>
+:table_name:&nbsp;nazwa&nbsp;tablicy&nbsp;do&nbsp;której&nbsp;jest&nbsp;dodawany&nbsp;rekord<br>
+:kwargs:&nbsp;słownik&nbsp;którego&nbsp;klucze&nbsp;są&nbsp;nazwami&nbsp;atrybutów&nbsp;tablicy,&nbsp;a&nbsp;wartości&nbsp;tym,&nbsp;co&nbsp;należy&nbsp;tam&nbsp;zapisać<br>
+Zwraca&nbsp;0&nbsp;jeśli&nbsp;wszystko&nbsp;się&nbsp;powiedzie,&nbsp;lub&nbsp;liczbę&nbsp;inną&nbsp;niż&nbsp;0&nbsp;jeśli&nbsp;wystąpią&nbsp;błędy</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>connection</strong> = &lt;django.utils.connection.ConnectionProxy object&gt;</td></tr></table>
+</body></html>
