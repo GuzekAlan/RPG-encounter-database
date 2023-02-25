@@ -7,6 +7,8 @@ It allows to store encounters, show them and delete them. ADMIN has rights to mo
 
 ![Preview](img/preview.png)
 
+Live demo: https://rpg-encounter.aguzek.com
+
 ## Instalation
 
 * First install requirements
